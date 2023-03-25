@@ -1,13 +1,13 @@
 /*
-c o o k
-CART 263, Creative Computation II, Winter 2023
+MQTT template
+CART253, Creative Computation, Fall 2022
 Concordia University
-Aurora Becerra Granados & Abigail Lopez
+l wilkins
+
 
 
 We are using the Eclipse Paho MQTT client library: https://www.eclipse.org/paho/clients/js/ to create an MQTT client that sends and receives messages. The client is set up for use on the shiftr.io test MQTT broker (https://shiftr.io/try)
 
-Desktop Sketch
 */
 
 
@@ -26,26 +26,16 @@ let creds = {
 let topic = 'CART253'; // This is the topic we are all subscribed to
 // End of MQTT client details
 
-// declare colour variables
-let orange, lOrange, white, lBlue, blue;
-
-
 
 
 function setup() {
-  // colour palette
-  orange = color(255, 159, 28);
-  lOrange = color(255, 191, 105);
-  white = color(255);
-  lBlue = color(203, 243, 240);
-  blue = color(48, 198, 182);
-
-  createCanvas(windowWidth, windowHeight);
+  // Normal program setup goes here
+  createCanvas(800, 400);
   MQTTsetup(); // Setup the MQTT client
 }
 
 function draw() {
-  background(orange);
+  background(50);
 }
 
 function mousePressed(){
@@ -81,13 +71,11 @@ function onConnect() {
   console.log("connected");
   // is working
 }
-
 function onConnectionLost(response) {
   if (response.errorCode !== 0) {
     // If it stops working
   }
 }
-
 function MQTTsetup(){
   client = new Paho.MQTT.Client(broker.hostname, Number(broker.port), creds.clientID);
   client.onConnectionLost = onConnectionLost;
@@ -98,8 +86,4 @@ function MQTTsetup(){
     password: creds.password, // password
     useSSL: true
   });
-}
-
-function menuScreen(){
-  
 }
