@@ -29,12 +29,14 @@ let topic = 'CART253'; // This is the topic we are all subscribed to
 // declare colour variables
 let orange, lOrange, white, lBlue, blue;
 
-let showMenu, ready; // booleans
+let showMenu, ready, potTime; // booleans
 
 // declare font variables
 let menuFont;
 
-let mButtonArray = []; // declare array for menu buttons
+let mButtonArray = []; // declare array for menu buttons objects
+let ingArray = []; // ingredients array original
+let recipe = [];
 
 let imgConsome, imgLock; // declaring variables for images
 
@@ -43,8 +45,14 @@ function preload() {
 
   imgConsome = loadImage('assets/foods/consome.png');
   imgLock = loadImage('assets/lock.png');
+
+  ingArray = ["carrot", "chicken", "chile", "milk", "pomSeed", "potato", "rice", "vinegar"];
 }
 
+// This is my setup function...
+// declaring colours, other variables that need to be assigned values,
+// canvas and mqtt stuff
+// create four buttons
 function setup() {
   // colour palette
   orange = color(255, 159, 28);
@@ -55,6 +63,7 @@ function setup() {
 
   showMenu = true; // Display menu screen
   ready = false;
+  potTime = false;
 
   createCanvas(800, 500);
   MQTTsetup(); // Setup the MQTT client
@@ -69,6 +78,10 @@ function draw() {
 
   if(showMenu){
     menuScreen();
+  }
+
+  if(potTime){
+    showPot();
   }
 }
 
@@ -175,9 +188,12 @@ function startButton(){
     ready = false;
   }
 
-  if(mouseX >= 290 && mouseX <= 510 && mouseY >= 420 && mouseY <= 490){
-    if(mouseIsPressed && ready){
-      showMenu = false;
+  if(mouseX >= 290 && mouseX <= 510 && mouseY >= 420 && mouseY <= 490){ // when game is ready to begin...
+    if(mouseIsPressed && ready){ // if button clicked:
+      setRecipe(); // choose recipe
+      showMenu = false; // get rid of menu
+      potTime = true; // show pot
+
     }
   }
 
@@ -238,4 +254,32 @@ class MenuButtons {
     }
   }
 
+}
+
+function setRecipe(){
+  print(ingArray); // og array
+ // recipe = shuffle(ingArray); // shuffle array commented out for now, see if people want to have randomized/cute zine recipe book?
+  print(recipe);
+
+  let nomOfIng; // variable to determine how many ingredients should be in the recipe.. 
+                // each dish corresponds to a different difficulty
+
+  if(mButtonArray[0].selected){ // consome de pollo will only have 3 ingredients that need to be chosen
+    nomOfIng = 5;               // if statement will be changed post playtest to include other dishes.
+  }
+
+  for(let i = 0; i < nomOfIng; i++){ // shorten array
+    recipe = shorten(ingArray); //for if we want to randomize things
+  }
+
+  print(recipe);
+  // ADD A THING TO SEND RECIPE!!!!! post playtest, we need to ask if people like zine or not
+
+}
+
+function showPot(){
+  background(lOrange);
+  fill(orange);
+  rect(330, 250, 170, 170, 20);
+  rect(300, 250, 230, 30, 20);
 }
