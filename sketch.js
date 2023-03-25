@@ -1,9 +1,8 @@
 /*
-MQTT template
-CART253, Creative Computation, Fall 2022
+c o o k
+CART 263, Creative Computation II, Winter 2023
 Concordia University
-l wilkins
-
+Aurora Becerra Granados & Abigail Lopez
 
 
 We are using the Eclipse Paho MQTT client library: https://www.eclipse.org/paho/clients/js/ to create an MQTT client that sends and receives messages. The client is set up for use on the shiftr.io test MQTT broker (https://shiftr.io/try)
