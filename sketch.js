@@ -36,8 +36,13 @@ let menuFont;
 
 let mButtonArray = []; // declare array for menu buttons
 
+let imgConsome, imgLock; // declaring variables for images
+
 function preload() {
-  menuFont = loadFont('assets/fonts/menu/CoveredByYourGrace-Regular.ttf');
+  menuFont = loadFont('assets/fonts/menu/CoveredByYourGrace-Regular.ttf'); // load fonts
+
+  imgConsome = loadImage('assets/foods/consome.png');
+  imgLock = loadImage('assets/lock.png');
 }
 
 function setup() {
@@ -139,9 +144,15 @@ function menuScreen(){
     mButtonArray[i].display(); // display menu buttons!
   }
 
-  startButton();
+  startButton(); // function to display/work for start button
 
-  itemDesc();
+  itemDesc(); // function to display info abt the food when selected
+
+  image(imgConsome, 85, 270); // consome de pollo pic
+
+  for(let i = 0; i < 3; i++){
+    image(imgLock, 270 + (i* 180), 270);
+  }
 }
 
 function startButton(){
@@ -181,7 +192,7 @@ function itemDesc(){ // display info about the recipe!
   else if(mButtonArray[1].selected || mButtonArray[2].selected || mButtonArray[3].selected){ // unplayable for first playtest
     fill(white); // text
     textSize(32)
-    text('cant play this one yet sorry :(', 400, 180);
+    text('we cant play this one yet sorry :(', 400, 180);
   }
   else{
     fill(white); // text
