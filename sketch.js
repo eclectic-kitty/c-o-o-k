@@ -29,6 +29,7 @@ let topic = 'CART253'; // This is the topic we are all subscribed to
 // declare colour variables
 let orange, lOrange, white, lBlue, blue;
 
+let showMenu;
 
 
 
@@ -40,12 +41,16 @@ function setup() {
   lBlue = color(203, 243, 240);
   blue = color(48, 198, 182);
 
-  createCanvas(windowWidth, windowHeight);
+  showMenu = true; // Display menu screen
+
+  createCanvas(800, 500);
   MQTTsetup(); // Setup the MQTT client
 }
 
 function draw() {
   background(orange);
+
+  menuScreen();
 }
 
 function mousePressed(){
@@ -101,5 +106,17 @@ function MQTTsetup(){
 }
 
 function menuScreen(){
-  
+
+  // text box
+  noStroke();
+  fill(lOrange);
+  rect(30, 40, 740, 80, 20);
+  // text
+  fill(white);
+  textSize(60);
+  textAlign(CENTER, CENTER);
+  text('CHOOSE YOUR RECIPE!', 400, 80);
+
+
+
 }
