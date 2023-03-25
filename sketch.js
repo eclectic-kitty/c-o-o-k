@@ -62,7 +62,9 @@ function setup() {
 function draw() {
   background(orange);
 
-  menuScreen();
+  if(showMenu){
+    menuScreen();
+  }
 }
 
 // function mousePressed(){
@@ -138,6 +140,8 @@ function menuScreen(){
   }
 
   startButton();
+
+  itemDesc();
 }
 
 function startButton(){
@@ -153,16 +157,37 @@ function startButton(){
   textSize(64);
   text('BEGIN!', 400, 445);
 
-  if (mButtonArray[0].selected){
+  if(mButtonArray[0].selected){ // rn we're playtesting only the first recipe, so if that's clicked, boolean = true
     ready = true;
   }
   else{
     ready = false;
   }
+
+  if(mouseX >= 290 && mouseX <= 510 && mouseY >= 420 && mouseY <= 490){
+    if(mouseIsPressed && ready){
+      showMenu = false;
+    }
+  }
+
 }
 
-function keyPressed(){
-  ready = true;
+function itemDesc(){ // display info about the recipe!
+  if(mButtonArray[0].selected){ // consomme de pollo
+    fill(white); // text
+    textSize(24);
+    text('CONSOME DE POLLO – Scrumptious and homey, this simple classic\nwill lay a blanket over you after you pass out on the couch from\na night of clubbing and kiss you tenderly on the eyelids.', 400, 180);
+  }
+  else if(mButtonArray[1].selected || mButtonArray[2].selected || mButtonArray[3].selected){ // unplayable for first playtest
+    fill(white); // text
+    textSize(32)
+    text('cant play this one yet sorry :(', 400, 180);
+  }
+  else{
+    fill(white); // text
+    textSize(64);
+    text('...', 400, 160);
+  }
 }
 
 class MenuButtons {
