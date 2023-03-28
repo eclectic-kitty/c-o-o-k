@@ -1,16 +1,10 @@
 /*
-MQTT template
-CART253, Creative Computation, Fall 2022
-Concordia University
-l wilkins
-
+Script to run on phone
 
 
 We are using the Eclipse Paho MQTT client library: https://www.eclipse.org/paho/clients/js/ to create an MQTT client that sends and receives messages. The client is set up for use on the shiftr.io test MQTT broker (https://shiftr.io/try)
 
 */
-
-
 
 // MQTT client details. We are using a public server called shiftr.io. Don't change this.
 let broker = {
@@ -28,19 +22,83 @@ let topic = 'CART253'; // This is the topic we are all subscribed to
 
 
 
+
+let ingredients = [];
+let ingrNames = ['carrot', 'chicken', 'chile', 'milk', 'pomSeed', 'potato', 'rice', 'vinegar'];
+let ingrImgs = [];
+let started = false;
+//let ingrImgs = {carrot: 0, chicken: 0, chile: 0, milk: 0, pomSeed: 0, potato: 0, rice: 0, vinegar: 0};
+
+function preload() {
+  // Load ingredient images
+  for (let i = 0; i < ingrNames.length; i++) {
+    let img = loadImage('/assets/ingredients/' + ingrNames[i] + '.png');
+    ingrImgs.push(img);
+  }
+}
+
 function setup() {
-  // Normal program setup goes here
-  createCanvas(800, 400);
+  frameRate(30);
+  noSmooth();
+  createCanvas(windowWidth, windowHeight);
   MQTTsetup(); // Setup the MQTT client
+
+  console.log(width + ', ' + height);
 }
 
 function draw() {
-  background(50);
+  if (started && ingredients.length == 0) { spawnIngredients() }
+
+  background(48, 198, 182);
+  for (let i = 0; i < ingredients.length; i++) {
+    ingredients[i].drawIngr();
+  }
 }
 
-function mousePressed(){
-  // Sends a message on mouse pressed to test. You can use sendMQTTMessage(msg) at any time, it doesn't have to be on mouse pressed.
-  sendMQTTMessage("howdy"); // This function takes 1 parameter, here I used a random number between 0 and 255 and constrained it to an integer. You can use anything you want.
+function spawnIngredients() {
+  for (let i = 0; i < ingrNames.length; i++) {
+    let ingr = new Ingredient(ingrNames[i], ingrImgs[i]);
+    ingredients.push(ingr);
+  }
+}
+
+function mouseClicked() {
+  for (i = 0; i < ingredients.length; i++) {
+    ingredients[i].touchedCheck(mouseX, mouseY);
+  }
+}
+
+class Ingredient {
+  constructor (name, img) {
+    this.name = name;
+    this.img = img;
+    this.size = 2.5;
+    
+    this.x = random(width - 100 * this.size);
+    this.y = random(height - 100 * this.size);
+
+    this.held = false;
+  }
+
+  drawIngr() {
+    if (!this.held) {
+      image(this.img, this.x, this.y, 100*this.size, 100*this.size);
+    }
+  }
+
+  touchedCheck(touchX, touchY) {
+    if (!this.held && touchX > this.x && touchX < this.x + 100*this.size && touchY > this.y && touchY < this.y + 100*this.size) {
+      sendMQTTMessage(this.name)
+      this.held = true;
+    }
+  }
+}
+
+
+function keyPressed() {
+  if (keyCode == 32) {
+    started = true;
+  }
 }
 
 
@@ -58,6 +116,10 @@ function sendMQTTMessage(msg) {
 function onMessageArrived(message) {
   print("Message Received:");
   print(message.payloadString); // Print the incoming message
+
+  if (message.payloadString == "start!") {
+    started = true;
+  }
 
   // You can do something like this to compare. Dont' forget to make it an int
   if(int(message.payloadString) == 10){
