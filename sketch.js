@@ -29,6 +29,10 @@ let topic = 'CART253'; // This is the topic we are all subscribed to
 let myName = "display"; // Who are you? Make sure it matches the previous person's variable!
 let nextName = "phone"; // Who is next on the list? Make sure it matches the next person's variable!
 
+
+
+
+
 // declare colour variables
 let orange, lOrange, white, lBlue, blue;
 
@@ -38,13 +42,15 @@ let showMenu, ready, potTime; // booleans
 let menuFont;
 
 let mButtonArray = []; // declare array for menu buttons objects
-let ingArray = []; // ingredients array original
 let recipe = [];
 let ingAdded = []; // ingredients added by other player, object array
 let playerAttempt = []; // ingredients added by other player, string array
 let ingCounter;
 
-let imgConsome, imgLock, imgCarrot, imgChicken, imgChile, imgMilk, imgPomSeed, imgPotato, imgRice, imgVinegar; // declaring variables for images
+
+let ingrNames = ['carrot', 'chicken', 'chile', 'milk', 'pomSeed', 'potato', 'rice', 'vinegar'];
+let ingrImgs = [];
+let imgConsome, imgLock; // declaring variables for non-ingredient images
 
 function preload() {
   menuFont = loadFont('assets/fonts/menu/CoveredByYourGrace-Regular.ttf'); // load fonts
@@ -52,17 +58,11 @@ function preload() {
   imgConsome = loadImage('assets/foods/consome.png');
   imgLock = loadImage('assets/lock.png');
 
-  // ingredients
-  imgCarrot = loadImage('assets/ingredients/carrot.png');
-  imgChicken = loadImage('assets/ingredients/chicken.png');
-  imgChile = loadImage('assets/ingredients/chile.png');
-  imgMilk = loadImage('assets/ingredients/milk.png');
-  imgPomSeed = loadImage('assets/ingredients/pomSeed.png');
-  imgPotato = loadImage('assets/ingredients/potato.png');
-  imgRice = loadImage('assets/ingredients/rice.png');
-  imgVinegar = loadImage('assets/ingredients/vinegar.png');
-
-  ingArray = ["carrot", "chicken", "chile", "milk", "pomSeed", "potato", "rice", "vinegar"];
+  // Load ingredient images
+  for (let i = 0; i < ingrNames.length; i++) {
+    let img = loadImage('/assets/ingredients/' + ingrNames[i] + '.png');
+    ingrImgs.push(img);
+  }
 }
 
 // This is my setup function...
@@ -117,64 +117,6 @@ function draw() {
 //   sendMQTTMessage("howdy"); // This function takes 1 parameter, here I used a random number between 0 and 255 and constrained it to an integer. You can use anything you want.
 // }
 
-
-// Sending a message like this:
-function sendMQTTMessage(msg) {
-      message = new Paho.MQTT.Message(myName + "/" + nextName+"/"+ msg); // add messages together:
-
-      message.destinationName = topic;
-      print("Message Sent!");
-      client.send(message); // send message
-}
-
-// When a message arrives, do this:
-function onMessageArrived(message) {
-  print("Message Received:");
-  print(message.payloadString); // Print the incoming message
-  // sentIngredient = message;
-
-  let dataReceive = split(trim(message.payloadString), "/");// Split the incoming message into an array deliniated by "/"
-  console.log("Message for:");
-  console.log(String(dataReceive[1]));
-// 0 is who its from
-// 1 is who its for
-// 2 is the data
-  if(dataReceive[1] == myName){ // Check if its for me
-    console.log("Its for me! :) ");
-    console.log("ingredient added = " + dataReceive[2]);
-
-      // You can do something like this to compare. Dont' forget to make it an int
-    ingAdded.push(new Ingredient(dataReceive[2])); // add to object array
-    playerAttempt[ingCounter] = dataReceive[2]; // add to string array
-  }
-
-
-}
-
-// Callback functions
-function onConnect() {
-  client.subscribe(topic);
-  console.log("connected");
-  // is working
-}
-
-function onConnectionLost(response) {
-  if (response.errorCode !== 0) {
-    // If it stops working
-  }
-}
-
-function MQTTsetup(){
-  client = new Paho.MQTT.Client(broker.hostname, Number(broker.port), creds.clientID);
-  client.onConnectionLost = onConnectionLost;
-  client.onMessageArrived = onMessageArrived;
-  client.connect({
-        onSuccess: onConnect,
-    userName: creds.userName, // username
-    password: creds.password, // password
-    useSSL: true
-  });
-}
 
 function menuScreen(){
   // text box
@@ -298,7 +240,7 @@ class MenuButtons {
 }
 
 class Ingredient {
-  constructor(name) {
+  constructor(name, img) {
     this.name = name;
     this.xPos = 400;
     this.yPos = 0;
@@ -339,4 +281,72 @@ function showPot(){
   fill(orange);
   rect(330, 250, 170, 170, 20);
   rect(300, 250, 230, 30, 20);
+}
+
+
+
+
+
+// Sending a message like this:
+function sendMQTTMessage(msg) {
+  message = new Paho.MQTT.Message(myName + "/" + nextName+"/"+ msg); // add messages together:
+
+  message.destinationName = topic;
+  print("Message Sent!");
+  client.send(message); // send message
+}
+
+// When a message arrives, do this:
+function onMessageArrived(message) {
+  print("Message Received:");
+  print(message.payloadString); // Print the incoming message
+  // sentIngredient = message;
+
+  let dataReceive = split(trim(message.payloadString), "/");// Split the incoming message into an array deliniated by "/"
+  console.log("Message for:");
+  console.log(String(dataReceive[1]));
+  // 0 is who its from
+  // 1 is who its for
+  // 2 is the data
+  if(dataReceive[1] == myName){ // Check if its for me
+    console.log("Its for me! :) ");
+    let ingrReceived = dataReceive[2];
+    console.log("ingredient added = " + dataReceive[2]);
+
+    let index;
+    for (let i = 0; i < ingrNames; i++) {
+      if (ingrReceived == ingrNames[i]) {
+        ingAdded.push(new Ingredient(ingrReceived, ingrImgs[i])); // add to object array
+      }
+    }
+
+    playerAttempt[ingCounter] = ingrReceived; // add to string array
+}
+
+
+}
+
+// Callback functions
+function onConnect() {
+client.subscribe(topic);
+console.log("connected");
+// is working
+}
+
+function onConnectionLost(response) {
+if (response.errorCode !== 0) {
+// If it stops working
+}
+}
+
+function MQTTsetup(){
+client = new Paho.MQTT.Client(broker.hostname, Number(broker.port), creds.clientID);
+client.onConnectionLost = onConnectionLost;
+client.onMessageArrived = onMessageArrived;
+client.connect({
+    onSuccess: onConnect,
+userName: creds.userName, // username
+password: creds.password, // password
+useSSL: true
+});
 }
