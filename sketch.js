@@ -36,7 +36,7 @@ let nextName = "phone"; // Who is next on the list? Make sure it matches the nex
 // declare colour variables
 let orange, lOrange, white, lBlue, blue;
 
-let showMenu, ready, potTime; // booleans
+let showMenu, ready, potTime, endScreen; // booleans
 
 // declare font variables
 let menuFont;
@@ -44,12 +44,13 @@ let menuFont;
 let mButtonArray = []; // declare array for menu buttons objects
 let recipe = [];
 let ingAdded = []; // ingredients added by other player, object array
-let playerAttempt = []; // ingredients added by other player, string array
 let ingCounter;
+let wrongCounter = 0;
 
 
 let ingrNames = ['carrot', 'chicken', 'chile', 'milk', 'pomSeed', 'potato', 'rice', 'vinegar'];
 let ingrImgs = [];
+let recipIngr = [];
 let imgConsome, imgLock; // declaring variables for non-ingredient images
 
 function preload() {
@@ -80,6 +81,7 @@ function setup() {
   showMenu = true; // Display menu screen
   ready = false;
   potTime = false;
+  endScreen = false;
 
   ingCounter = 0;
 
@@ -108,6 +110,10 @@ function draw() {
     }
 
     showPot();
+  }
+
+  if(endScreen){
+    showEnd();
   }
   
 }
@@ -242,34 +248,41 @@ class MenuButtons {
 class Ingredient {
   constructor(name, img) {
     this.name = name;
-    this.xPos = 400;
+    this.img = img;
+    this.xPos = 350;
     this.yPos = 0;
+
+    this.size = 150;
   }
 
   display() {
     fill(0);
-    circle(this.xPos, this.yPos, 20);
+    //circle(this.xPos, this.yPos, 20);
+    image(this.img, this.xPos, this.yPos, this.size, this.size);
     
     if(this.yPos < 300){
     this.yPos++;
+    }
+
+    if(this.yPos == 300 && ingAdded.length == recipIngr.length){
+      potTime = false;
+      
+      endScreen = true;
+
     }
   }
 }
 
 function setRecipe(){
-  print(ingArray); // og array
- // recipe = shuffle(ingArray); // shuffle array commented out for now, see if people want to have randomized/cute zine recipe book?
+  print(ingrNames); // og array
+ // recipe = shuffle(ingrNames); // shuffle array commented out for now, see if people want to have randomized/cute zine recipe book?
   print(recipe);
 
   let nomOfIng; // variable to determine how many ingredients should be in the recipe.. 
                 // each dish corresponds to a different difficulty
 
   if(mButtonArray[0].selected){ // consome de pollo will only have 3 ingredients that need to be chosen
-    nomOfIng = 5;               // if statement will be changed post playtest to include other dishes.
-  }
-
-  for(let i = 0; i < nomOfIng; i++){ // shorten array
-    recipe = shorten(ingArray); //for if we want to randomize things
+    recipIngr = ['carrot', 'chicken', 'chile'];            // if statement will be changed post playtest to include other dishes.
   }
 
   print(recipe);
@@ -283,6 +296,18 @@ function showPot(){
   rect(300, 250, 230, 30, 20);
 }
 
+function showEnd(){
+  if(wrongCounter > 0){
+    fill(white);
+    textSize(32)
+    text('you failed.', 400, 250);
+  }
+  else{
+    fill(white);
+    textSize(32)
+    text('you cooked food! good job.', 400, 250);
+  }
+}
 
 
 
@@ -313,14 +338,21 @@ function onMessageArrived(message) {
     let ingrReceived = dataReceive[2];
     console.log("ingredient added = " + dataReceive[2]);
 
-    let index;
-    for (let i = 0; i < ingrNames; i++) {
+    console.log(ingrNames.length);
+    for (let i = 0; i < ingrNames.length; i++) {
+      console.log(ingrReceived + ', ' + ingrNames[i]);
       if (ingrReceived == ingrNames[i]) {
         ingAdded.push(new Ingredient(ingrReceived, ingrImgs[i])); // add to object array
       }
     }
 
-    playerAttempt[ingCounter] = ingrReceived; // add to string array
+    if (ingAdded.length != recipIngr.length){
+      let i = ingAdded.length;
+      if (ingAdded[i-1].name != recipIngr[i-1]) {
+        wrongCounter++;
+      }
+    }
+    console.log(wrongCounter);
 }
 
 
