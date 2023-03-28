@@ -26,6 +26,9 @@ let creds = {
 let topic = 'CART253'; // This is the topic we are all subscribed to
 // End of MQTT client details
 
+let myName = "display"; // Who are you? Make sure it matches the previous person's variable!
+let nextName = "phone"; // Who is next on the list? Make sure it matches the next person's variable!
+
 // declare colour variables
 let orange, lOrange, white, lBlue, blue;
 
@@ -37,14 +40,18 @@ let menuFont;
 let mButtonArray = []; // declare array for menu buttons objects
 let ingArray = []; // ingredients array original
 let recipe = [];
+let ingAdded = []; // ingredients added by other player, object array
+let playerAttempt = []; // ingredients added by other player, string array
+let ingCounter;
 
-let imgConsome, imgLock; // declaring variables for images
+let imgConsome, imgLock, imgCarrot, imgChicken, imgChile; // declaring variables for images
 
 function preload() {
   menuFont = loadFont('assets/fonts/menu/CoveredByYourGrace-Regular.ttf'); // load fonts
 
   imgConsome = loadImage('assets/foods/consome.png');
   imgLock = loadImage('assets/lock.png');
+  imgCarrot = loadImage('assets/ingredients/carrot.png');
 
   ingArray = ["carrot", "chicken", "chile", "milk", "pomSeed", "potato", "rice", "vinegar"];
 }
@@ -65,6 +72,8 @@ function setup() {
   ready = false;
   potTime = false;
 
+  ingCounter = 0;
+
   createCanvas(800, 500);
   MQTTsetup(); // Setup the MQTT client
 
@@ -83,6 +92,10 @@ function draw() {
   if(potTime){
     showPot();
   }
+
+  for(let i = 0; i < ingCounter; i++){
+    ingAdded[i].display();
+  }
 }
 
 // function mousePressed(){
@@ -93,23 +106,36 @@ function draw() {
 
 // Sending a message like this:
 function sendMQTTMessage(msg) {
-      message = new Paho.MQTT.Message(String(msg)); // Make your message a string and send it
+      message = new Paho.MQTT.Message(myName + "/" + nextName+"/"+ msg); // add messages together:
 
       message.destinationName = topic;
       print("Message Sent!");
       client.send(message); // send message
 }
 
-
 // When a message arrives, do this:
 function onMessageArrived(message) {
   print("Message Received:");
   print(message.payloadString); // Print the incoming message
+  // sentIngredient = message;
 
-  // You can do something like this to compare. Dont' forget to make it an int
-  if(int(message.payloadString) == 10){
-    console.log("yup");
+  let dataReceive = split(trim(message.payloadString), "/");// Split the incoming message into an array deliniated by "/"
+  console.log("Message for:");
+  console.log(String(dataReceive[1]));
+// 0 is who its from
+// 1 is who its for
+// 2 is the data
+  if(dataReceive[1] == myName){ // Check if its for me
+    console.log("Its for me! :) ");
+    console.log("ingredient added = " + dataReceive[2]);
+
+      // You can do something like this to compare. Dont' forget to make it an int
+    ingAdded[ingCounter] = new Ingredient(dataReceive[2]); // add to object array
+    playerAttempt[ingCounter] = dataReceive[2]; // add to string array
+    ingCounter++; // increase nom of ings
   }
+
+
 }
 
 // Callback functions
@@ -193,6 +219,7 @@ function startButton(){
       setRecipe(); // choose recipe
       showMenu = false; // get rid of menu
       potTime = true; // show pot
+      sendMQTTMessage("start!"); // tell other person to start
 
     }
   }
@@ -254,6 +281,19 @@ class MenuButtons {
     }
   }
 
+}
+
+class Ingredient {
+  constructor(name) {
+    this.name = name;
+    this.xPos = random(800);
+    this.yPos = random(500);
+  }
+
+  display() {
+    fill(0);
+    circle(this.xPos, this.yPos, 20);
+  }
 }
 
 function setRecipe(){
