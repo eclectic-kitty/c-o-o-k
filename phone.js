@@ -20,6 +20,8 @@ let creds = {
 let topic = 'CART253'; // This is the topic we are all subscribed to
 // End of MQTT client details
 
+let myName = "phone"; // Who are you? Make sure it matches the previous person's variable!
+let nextName = "display"; // Who is next on the list? Make sure it matches the next person's variable!
 
 
 
@@ -104,11 +106,11 @@ function keyPressed() {
 
 // Sending a message like this:
 function sendMQTTMessage(msg) {
-      message = new Paho.MQTT.Message(String(msg)); // Make your message a string and send it
+  message = new Paho.MQTT.Message(myName + "/" + nextName+"/"+ msg); // add messages together:
 
-      message.destinationName = topic;
-      print("Message Sent!");
-      client.send(message); // send message
+  message.destinationName = topic;
+  print("Message Sent!");
+  client.send(message); // send message
 }
 
 
@@ -116,14 +118,19 @@ function sendMQTTMessage(msg) {
 function onMessageArrived(message) {
   print("Message Received:");
   print(message.payloadString); // Print the incoming message
+  // sentIngredient = message;
 
-  if (message.payloadString == "start!") {
-    started = true;
-  }
+  let dataReceive = split(trim(message.payloadString), "/");// Split the incoming message into an array deliniated by "/"
+// 0 is who its from
+// 1 is who its for
+// 2 is the data
 
-  // You can do something like this to compare. Dont' forget to make it an int
-  if(int(message.payloadString) == 10){
-    console.log("yup");
+  if(dataReceive[1] == myName){ // Check if its for me
+    console.log("Its for me! :) ");
+  
+    if (dataReceive[2] == "start!") {
+      started = true;
+    }
   }
 }
 
