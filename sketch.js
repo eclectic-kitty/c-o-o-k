@@ -44,14 +44,23 @@ let ingAdded = []; // ingredients added by other player, object array
 let playerAttempt = []; // ingredients added by other player, string array
 let ingCounter;
 
-let imgConsome, imgLock, imgCarrot, imgChicken, imgChile; // declaring variables for images
+let imgConsome, imgLock, imgCarrot, imgChicken, imgChile, imgMilk, imgPomSeed, imgPotato, imgRice, imgVinegar; // declaring variables for images
 
 function preload() {
   menuFont = loadFont('assets/fonts/menu/CoveredByYourGrace-Regular.ttf'); // load fonts
 
   imgConsome = loadImage('assets/foods/consome.png');
   imgLock = loadImage('assets/lock.png');
+
+  // ingredients
   imgCarrot = loadImage('assets/ingredients/carrot.png');
+  imgChicken = loadImage('assets/ingredients/chicken.png');
+  imgChile = loadImage('assets/ingredients/chile.png');
+  imgMilk = loadImage('assets/ingredients/milk.png');
+  imgPomSeed = loadImage('assets/ingredients/pomSeed.png');
+  imgPotato = loadImage('assets/ingredients/potato.png');
+  imgRice = loadImage('assets/ingredients/rice.png');
+  imgVinegar = loadImage('assets/ingredients/vinegar.png');
 
   ingArray = ["carrot", "chicken", "chile", "milk", "pomSeed", "potato", "rice", "vinegar"];
 }
@@ -89,13 +98,18 @@ function draw() {
     menuScreen();
   }
 
+
+
   if(potTime){
+    background(lOrange);
+
+    for(let i = 0; i < ingAdded.length; i++){
+      ingAdded[i].display();
+    }
+
     showPot();
   }
-
-  for(let i = 0; i < ingCounter; i++){
-    ingAdded[i].display();
-  }
+  
 }
 
 // function mousePressed(){
@@ -130,9 +144,8 @@ function onMessageArrived(message) {
     console.log("ingredient added = " + dataReceive[2]);
 
       // You can do something like this to compare. Dont' forget to make it an int
-    ingAdded[ingCounter] = new Ingredient(dataReceive[2]); // add to object array
+    ingAdded.push(new Ingredient(dataReceive[2])); // add to object array
     playerAttempt[ingCounter] = dataReceive[2]; // add to string array
-    ingCounter++; // increase nom of ings
   }
 
 
@@ -208,7 +221,8 @@ function startButton(){
   text('BEGIN!', 400, 445);
 
   if(mButtonArray[0].selected){ // rn we're playtesting only the first recipe, so if that's clicked, boolean = true
-    ready = true;
+    ready = true; 
+    ingCounter = 3;
   }
   else{
     ready = false;
@@ -286,13 +300,17 @@ class MenuButtons {
 class Ingredient {
   constructor(name) {
     this.name = name;
-    this.xPos = random(800);
-    this.yPos = random(500);
+    this.xPos = 400;
+    this.yPos = 0;
   }
 
   display() {
     fill(0);
     circle(this.xPos, this.yPos, 20);
+    
+    if(this.yPos < 300){
+    this.yPos++;
+    }
   }
 }
 
@@ -318,7 +336,6 @@ function setRecipe(){
 }
 
 function showPot(){
-  background(lOrange);
   fill(orange);
   rect(330, 250, 170, 170, 20);
   rect(300, 250, 230, 30, 20);
