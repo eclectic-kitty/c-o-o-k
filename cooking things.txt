@@ -1,3 +1,16 @@
+Features/stuff:
+- Need
+    - Pot and feedback
+    - randomized recipes
+    - Ingredient selector
+    - 2 more recipes
+- Want
+    - more ingredients
+    - Finetuning
+    - Scale of failure
+- Extras
+    - Flavour text
+
 recipes:
 consome de pollo
 Scrumptious and homey, this simple classic will lay a blanket over you after you pass out on the couch from a night of clubbing and kiss you tenderly on the eyelids.
