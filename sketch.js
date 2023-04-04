@@ -44,7 +44,6 @@ let menuFont;
 let mButtonArray = []; // declare array for menu buttons objects
 let recipe = [];
 let ingAdded = []; // ingredients added by other player, object array
-let ingCounter;
 let wrongCounter = 0;
 
 
@@ -82,8 +81,6 @@ function setup() {
   ready = false;
   potTime = false;
   endScreen = false;
-
-  ingCounter = 0;
 
   createCanvas(800, 500);
   MQTTsetup(); // Setup the MQTT client
@@ -168,9 +165,8 @@ function startButton(){
   textSize(64);
   text('BEGIN!', 400, 445);
 
-  if(mButtonArray[0].selected){ // rn we're playtesting only the first recipe, so if that's clicked, boolean = true
-    ready = true; 
-    ingCounter = 3;
+  if(mButtonArray[0].selected || mButtonArray[1].selected || mButtonArray[2].selected || mButtonArray[3].selected){
+    ready = true; // boolean to determine if valid recipe has been selected, and if game can start
   }
   else{
     ready = false;
@@ -194,10 +190,20 @@ function itemDesc(){ // display info about the recipe!
     textSize(24);
     text('CONSOME DE POLLO – Scrumptious and homey, this simple classic\nwill lay a blanket over you after you pass out on the couch from\na night of clubbing and kiss you tenderly on the eyelids.', 400, 180);
   }
-  else if(mButtonArray[1].selected || mButtonArray[2].selected || mButtonArray[3].selected){ // unplayable for first playtest
+  else if(mButtonArray[1].selected){ // adobo
     fill(white); // text
-    textSize(32)
-    text('we cant play this one yet sorry :(', 400, 180);
+    textSize(23)
+    text("ADOBO MANOK - Have you called your mom yet? When was the last time you told her\nyou loved her? This savoury chicken served with rice is sure to remind you of your parent's\nimpending mortality. You should visit them. Just pick up the phone.", 400, 180);
+  }
+  else if(mButtonArray[2].selected){ // halo halo
+    fill(white); // text
+    textSize(20)
+    text("HALO HALO - A popular cold dessert perfect for the summertime! The small light\nat the end of a very long tunnel of despair and dread and hopelessness and thinking\nthat nothing you do will ever matter, and really, when you think about it, is any of it\nworth it? Has anything you've done matter? This refreshing dish will put a pep in your step!", 400, 180);
+  }
+  else if(mButtonArray[3].selected){ // chiles en nogada
+    fill(white); // text
+    textSize(20)
+    text("CHILES EN NOGADA - Oh boy. Do you remember what it was? Yeah.\nWhat… How would I even describe such a dish? Shall I compare\nthee to the Mexican flag? Shall I describe thine warm, moist insides and\nthou sweet, sweet cream? That’s all I’ve got. This is an appetizing dish, I promise.", 400, 180);
   }
   else{
     fill(white); // text
@@ -274,20 +280,42 @@ class Ingredient {
 }
 
 function setRecipe(){
-  print(ingrNames); // og array
- // recipe = shuffle(ingrNames); // shuffle array commented out for now, see if people want to have randomized/cute zine recipe book?
-  print(recipe);
+  recipIngr = shuffle(ingrNames); // shuffle array commented out for now, see if people want to have randomized/cute zine recipe book?
 
-  let nomOfIng; // variable to determine how many ingredients should be in the recipe.. 
+  print("og recipe = " + ingrNames); // print og recipe
+  print("shuffled array = " + recipIngr); // print shuffled recipe
+
+  // let nomOfIng; // variable to determine how many ingredients should be in the recipe.. 
                 // each dish corresponds to a different difficulty
 
-  if(mButtonArray[0].selected){ // consome de pollo will only have 3 ingredients that need to be chosen
-    recipIngr = ['carrot', 'chicken', 'chile'];            // if statement will be changed post playtest to include other dishes.
+  // if(mButtonArray[0].selected){ // consome de pollo will only have 3 ingredients that need to be chosen
+  //   recipIngr = ['carrot', 'chicken', 'chile'];            // if statement will be changed post playtest to include other dishes.
+   
+  if(mButtonArray[0].selected){ // if consome pollo is selected
+    for(let i = 0; i < 5; i++){ // will only have 3 ingredients, therefore pop array 5 times
+      recipIngr.pop();
+    }
+   
+    print("new recipe = " + recipIngr); // print recipe that players will have to match
+  
   }
-
-  print(recipe);
-  // ADD A THING TO SEND RECIPE!!!!! post playtest, we need to ask if people like zine or not
-
+  if(mButtonArray[1].selected){ // adobo manok will have 5 ingredients
+    for(let i = 0; i < 3; i++){ // therefore pop 3 times
+      recipIngr.pop();
+    }
+   
+    print("new recipe = " + recipIngr); // print recipe that players will have to match
+  }
+  else if(mButtonArray[2].selected){ // halo halo will have 7 ingredients
+      recipIngr.pop(); // therefore pop once
+    
+   
+    print("new recipe = " + recipIngr); // print recipe that players will have to match
+  
+  }
+  else if(mButtonArray[3].selected){ // chiles en nogada will have 8 ingredients, no need to pop
+    print("new recipe = " + recipIngr); // print recipe
+  }
 }
 
 function showPot(){
