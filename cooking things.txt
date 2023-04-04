@@ -4,6 +4,7 @@ Features/stuff:
     - randomized recipes
     - Ingredient selector
     - 2 more recipes
+    - instructions for players
 - Want
     - more ingredients
     - Finetuning

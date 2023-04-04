@@ -45,18 +45,22 @@ let mButtonArray = []; // declare array for menu buttons objects
 let recipe = [];
 let ingAdded = []; // ingredients added by other player, object array
 let wrongCounter = 0;
+let pageNom = []; // array for what pages the user flips to
+
 
 
 let ingrNames = ['carrot', 'chicken', 'chile', 'milk', 'pomSeed', 'potato', 'rice', 'vinegar'];
 let ingrImgs = [];
 let recipIngr = [];
-let imgConsome, imgLock; // declaring variables for non-ingredient images
+let imgConsome, imgAdobo, imgChiles, imgHalo; // declaring variables for non-ingredient images
 
 function preload() {
   menuFont = loadFont('assets/fonts/menu/CoveredByYourGrace-Regular.ttf'); // load fonts
 
   imgConsome = loadImage('assets/foods/consome.png');
-  imgLock = loadImage('assets/lock.png');
+  imgAdobo = loadImage('assets/foods/adobo.png');
+  imgChiles = loadImage('assets/foods/chiles.png');
+  imgHalo = loadImage('assets/foods/haloHalo.png');
 
   // Load ingredient images
   for (let i = 0; i < ingrNames.length; i++) {
@@ -107,6 +111,7 @@ function draw() {
     }
 
     showPot();
+    showRecipe();
   }
 
   if(endScreen){
@@ -145,11 +150,17 @@ function menuScreen(){
 
   itemDesc(); // function to display info abt the food when selected
 
+  imgConsome.resize(100, 100);
   image(imgConsome, 85, 270); // consome de pollo pic
 
-  for(let i = 0; i < 3; i++){
-    image(imgLock, 270 + (i* 180), 270);
-  }
+  imgAdobo.resize(100, 100);
+  image(imgAdobo, 270, 270); // adobo pic
+
+  imgHalo.resize(100, 100);
+  image(imgHalo, 450, 270); // halo halo pic
+
+  imgChiles.resize(100, 100);
+  image(imgChiles, 630, 270); // chiles en nogada pic
 }
 
 function startButton(){
@@ -279,7 +290,7 @@ class Ingredient {
   }
 }
 
-function setRecipe(){
+function setRecipe(){ // randomly generate recipe user needs to follow + come up with page numbers users need to flip to
   recipIngr = shuffle(ingrNames); // shuffle array commented out for now, see if people want to have randomized/cute zine recipe book?
 
   print("og recipe = " + ingrNames); // print og recipe
@@ -316,12 +327,56 @@ function setRecipe(){
   else if(mButtonArray[3].selected){ // chiles en nogada will have 8 ingredients, no need to pop
     print("new recipe = " + recipIngr); // print recipe
   }
+
+  convertToPageNom(); // choose page numbers that reference ingredients in the recipe
 }
 
 function showPot(){
   fill(orange);
-  rect(330, 250, 170, 170, 20);
-  rect(300, 250, 230, 30, 20);
+  rect(330, 210, 170, 170, 20);
+  rect(300, 210, 230, 30, 20);
+}
+
+function showRecipe(){
+  fill(white);
+  textSize(32)
+  text('In this order, follow the instructions of the following pages: ', 400, 410);
+
+  textSize(60);
+  text(pageNom, 400, 450); // print page numbers
+}
+
+function convertToPageNom(){
+  for (let i = 0; i < recipIngr.length; i++){ // for as many ingredients as there is in the recipe
+    pageNom[i] = choosePage(recipIngr[i]); // page number for said ingredient will be randomized by this function
+  }
+}
+
+function choosePage(ingr){ // check ingredient name
+  if(ingr == "carrot"){
+    return int(random(13, 18)); // if ingredient is a carrot, return page number between 13-17
+  }
+  else if(ingr == "chicken"){
+    return int(random(18, 23)); // return page number
+  }
+  else if(ingr == "chile"){
+    return int(random(23, 28)); // return page number
+  }
+  else if(ingr == "milk"){
+    return int(random(28, 33)); // return page nom
+  }
+  else if(ingr == "pomSeed"){
+    return int(random(33, 38)); // return page nom
+  }
+  else if(ingr == "potato"){
+    return int(random(38, 43)); // return page nom
+  }
+  else if(ingr == "rice"){
+    return int(random(43, 48)); // return page nom
+  }
+  else if(ingr == "vinegar"){
+    return int(random(48, 53)); // return page nom
+  }
 }
 
 function showEnd(){
