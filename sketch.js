@@ -10,8 +10,6 @@ We are using the Eclipse Paho MQTT client library: https://www.eclipse.org/paho/
 Desktop Sketch
 */
 
-
-
 // MQTT client details. We are using a public server called shiftr.io. Don't change this.
 let broker = {
   hostname: 'public.cloud.shiftr.io',
@@ -31,12 +29,19 @@ let nextName = "phone"; // Who is next on the list? Make sure it matches the nex
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 // declare colour variables
 let orange, lOrange, white, lBlue, blue;
 
-let showMenu, ready, potTime, endScreen; // booleans
+let showMenu, ready, potTime, endScreen, camSetUp; // booleans
+
+let cam; // variable for the camera
+
+let menu; // variable for the menu's canvas
+let instructions; // variable for the in-game instructions' canvas
 
 // declare font variables
 let menuFont;
@@ -47,12 +52,11 @@ let ingAdded = []; // ingredients added by other player, object array
 let wrongCounter = 0;
 let pageNom = []; // array for what pages the user flips to
 
-
-
 let ingrNames = ['carrot', 'chicken', 'chile', 'milk', 'pomSeed', 'potato', 'rice', 'vinegar'];
-let ingrImgs = [];
-let recipIngr = [];
+let ingrImgs = []; // Array that will hold ingredient images
+let recipIngr = []; // Array that will hold a given recipe's ingredients
 let imgConsome, imgAdobo, imgChiles, imgHalo; // declaring variables for non-ingredient images
+let pot; // Variable for pot 3d model
 
 function preload() {
   menuFont = loadFont('assets/fonts/menu/CoveredByYourGrace-Regular.ttf'); // load fonts
@@ -67,13 +71,18 @@ function preload() {
     let img = loadImage('/assets/ingredients/' + ingrNames[i] + '.png');
     ingrImgs.push(img);
   }
+
+  pot = loadModel('assets/pooot.obj');
 }
 
-// This is my setup function...
 // declaring colours, other variables that need to be assigned values,
 // canvas and mqtt stuff
 // create four buttons
 function setup() {
+  createCanvas(800, 500, WEBGL);
+  angleMode(DEGREES);
+  MQTTsetup(); // Setup the MQTT client
+
   // colour palette
   orange = color(255, 159, 28);
   lOrange = color(255, 191, 105);
@@ -85,9 +94,10 @@ function setup() {
   ready = false;
   potTime = false;
   endScreen = false;
+  camSetUp = false;
 
-  createCanvas(800, 500);
-  MQTTsetup(); // Setup the MQTT client
+  menu = createGraphics(800, 500); // Sets up menu canvas
+  instructions = createGraphics(800, 500); // Sets up in-game instructions' canvas
 
   for(let i = 0; i < 4; i++){ // create four buttons
     mButtonArray[i] = new MenuButtons(i);
@@ -95,23 +105,40 @@ function setup() {
 }
 
 function draw() {
-  background(orange);
+  noStroke();
+  orbitControl();
 
   if(showMenu){
+    menu.background(orange);
     menuScreen();
+    texture(menu);
+    plane(800, 500);
   }
 
-
-
   if(potTime){
-    background(lOrange);
 
-    for(let i = 0; i < ingAdded.length; i++){
-      ingAdded[i].display();
+    if (!camSetUp) {
+      cam = createCamera();
+      cam.setPosition(0, -300, 275)
+      cam.tilt(45)
+      camSetUp = true;
     }
 
+    background(lOrange);
+
+    // ambientLight(225);
+    ambientLight(200);
+    let lC = 60; 
+    directionalLight(lC, lC, lC, -0.5, 1, -0.35) // for z axise, into the screen is lower numbers, out of the screen is higher
+
     showPot();
-    showRecipe();
+    
+    for (let i = 0; i < ingAdded.length; i++) {
+      ingAdded[i].updatePos();
+      ingAdded[i].display();
+  }
+
+    showInstr();
   }
 
   if(endScreen){
@@ -128,19 +155,21 @@ function draw() {
 
 function menuScreen(){
   // text box
-  noStroke();
+  menu.noStroke();
 
-  fill(lOrange)
-  rect(20, 25, 760, 110, 20); // lighter orange layer
-  fill(white);
-  rect(30, 40, 740, 80, 20); // white box
+
+
+  menu.fill(lOrange)
+  menu.rect(20, 25, 760, 110, 20); // lighter orange layer
+  menu.fill(white);
+  menu.rect(30, 40, 740, 80, 20); // white box
 
   // text
-  fill(orange);
-  textFont(menuFont);
-  textSize(70);
-  textAlign(CENTER, CENTER);
-  text('CHOOSE YOUR RECIPE!', 400, 70);
+  menu.fill(orange);
+  menu.textFont(menuFont);
+  menu.textSize(70);
+  menu.textAlign(CENTER, CENTER);
+  menu.text('CHOOSE YOUR RECIPE!', 400, 70);
 
   for(let i = 0; i< 4; i++){
     mButtonArray[i].display(); // display menu buttons!
@@ -151,30 +180,30 @@ function menuScreen(){
   itemDesc(); // function to display info abt the food when selected
 
   imgConsome.resize(100, 100);
-  image(imgConsome, 85, 270); // consome de pollo pic
+  menu.image(imgConsome, 85, 270); // consome de pollo pic
 
   imgAdobo.resize(100, 100);
-  image(imgAdobo, 270, 270); // adobo pic
+  menu.image(imgAdobo, 270, 270); // adobo pic
 
   imgHalo.resize(100, 100);
-  image(imgHalo, 450, 270); // halo halo pic
+  menu.image(imgHalo, 450, 270); // halo halo pic
 
   imgChiles.resize(100, 100);
-  image(imgChiles, 630, 270); // chiles en nogada pic
+  menu.image(imgChiles, 630, 270); // chiles en nogada pic
 }
 
 function startButton(){
   if(ready){ // if valid recipe has been chosen, button turns blue to indicate game can start
-    fill(blue);
+    menu.fill(blue);
   }
   else{
-    fill(lOrange);
+    menu.fill(lOrange);
   }
-  rect(290, 420, 220, 70, 20);
+  menu.rect(290, 420, 220, 70, 20);
 
-  fill(white); // text
-  textSize(64);
-  text('BEGIN!', 400, 445);
+  menu.fill(white); // text
+  menu.textSize(64);
+  menu.text('BEGIN!', 400, 445);
 
   if(mButtonArray[0].selected || mButtonArray[1].selected || mButtonArray[2].selected || mButtonArray[3].selected){
     ready = true; // boolean to determine if valid recipe has been selected, and if game can start
@@ -197,29 +226,29 @@ function startButton(){
 
 function itemDesc(){ // display info about the recipe!
   if(mButtonArray[0].selected){ // consomme de pollo
-    fill(white); // text
-    textSize(24);
-    text('CONSOME DE POLLO – Scrumptious and homey, this simple classic\nwill lay a blanket over you after you pass out on the couch from\na night of clubbing and kiss you tenderly on the eyelids.', 400, 180);
+    menu.fill(white); // text
+    menu.textSize(24);
+    menu.text('CONSOME DE POLLO – Scrumptious and homey, this simple classic\nwill lay a blanket over you after you pass out on the couch from\na night of clubbing and kiss you tenderly on the eyelids.', 400, 180);
   }
   else if(mButtonArray[1].selected){ // adobo
-    fill(white); // text
-    textSize(23)
-    text("ADOBO MANOK - Have you called your mom yet? When was the last time you told her\nyou loved her? This savoury chicken served with rice is sure to remind you of your parent's\nimpending mortality. You should visit them. Just pick up the phone.", 400, 180);
+    menu.fill(white); // text
+    menu.textSize(23)
+    menu.text("ADOBO MANOK - Have you called your mom yet? When was the last time you told her\nyou loved her? This savoury chicken served with rice is sure to remind you of your parent's\nimpending mortality. You should visit them. Just pick up the phone.", 400, 180);
   }
   else if(mButtonArray[2].selected){ // halo halo
-    fill(white); // text
-    textSize(20)
-    text("HALO HALO - A popular cold dessert perfect for the summertime! The small light\nat the end of a very long tunnel of despair and dread and hopelessness and thinking\nthat nothing you do will ever matter, and really, when you think about it, is any of it\nworth it? Has anything you've done matter? This refreshing dish will put a pep in your step!", 400, 180);
+    menu.fill(white); // text
+    menu.textSize(20)
+    menu.text("HALO HALO - A popular cold dessert perfect for the summertime! The small light\nat the end of a very long tunnel of despair and dread and hopelessness and thinking\nthat nothing you do will ever matter, and really, when you think about it, is any of it\nworth it? Has anything you've done matter? This refreshing dish will put a pep in your step!", 400, 180);
   }
   else if(mButtonArray[3].selected){ // chiles en nogada
-    fill(white); // text
-    textSize(20)
-    text("CHILES EN NOGADA - Oh boy. Do you remember what it was? Yeah.\nWhat… How would I even describe such a dish? Shall I compare\nthee to the Mexican flag? Shall I describe thine warm, moist insides and\nthou sweet, sweet cream? That’s all I’ve got. This is an appetizing dish, I promise.", 400, 180);
+    menu.fill(white); // text
+    menu.textSize(20)
+    menu.text("CHILES EN NOGADA - Oh boy. Do you remember what it was? Yeah.\nWhat… How would I even describe such a dish? Shall I compare\nthee to the Mexican flag? Shall I describe thine warm, moist insides and\nthou sweet, sweet cream? That’s all I’ve got. This is an appetizing dish, I promise.", 400, 180);
   }
   else{
-    fill(white); // text
-    textSize(64);
-    text('...', 400, 160);
+    menu.fill(white); // text
+    menu.textSize(64);
+    menu.text('...', 400, 160);
   }
 }
 
@@ -239,16 +268,16 @@ class MenuButtons {
 
   display() {
     if(this.selected){ // if a certain box is clicked, highlight it by making it blue
-      fill(blue);
+      menu.fill(blue);
     }
     else{
-      fill(lOrange);
+      menu.fill(lOrange);
     }
 
-    rect(this.xPos2, this.yPos2, this.size2, this.size2, this.roundedCorner); // back rectangle
+    menu.rect(this.xPos2, this.yPos2, this.size2, this.size2, this.roundedCorner); // back rectangle
 
-    fill(white);
-    rect(this.xPos, this.yPos, this.size, this.size, this.roundedCorner); // front rect.
+    menu.fill(white);
+    menu.rect(this.xPos, this.yPos, this.size, this.size, this.roundedCorner); // front rect.
 
     if(mouseIsPressed === true && mouseY >= this.yPos2 && mouseY <= (this.yPos + 170)){
       if(mouseX >= this.xPos2 && mouseX <= (this.xPos2 + 170)){
@@ -262,32 +291,75 @@ class MenuButtons {
 
 }
 
+function showPot(){
+  push();
+    scale(5);
+    shininess(2);
+    specularMaterial(182, 219, 217);
+    translate(0, 8, 0); // z: 350
+    rotateY(90);
+    rotateZ(180);
+    model(pot);
+  pop();
+}
+
 class Ingredient {
   constructor(name, img) {
-    this.name = name;
-    this.img = img;
-    this.xPos = 350;
-    this.yPos = 0;
+      this.name = name;
+      this.img = createGraphics(100, 100);
+      this.img.image(img, 0, 0, 100, 100);
+      
+      this.xOff = random(-60, 60);
+      this.yOff = -280; //-280
+      this.zOff = random(-60, 60);
 
-    this.size = 150;
+      this.size = 150;
   }
 
   display() {
-    fill(0);
-    //circle(this.xPos, this.yPos, 20);
-    image(this.img, this.xPos, this.yPos, this.size, this.size);
+    push();
+      translate(this.xOff, this.yOff, this.zOff)
+      texture(this.img);
+      //fill(255);
+      plane(100, 100);
+    pop();
+
+    // if(this.yPos == 300 && ingAdded.length == recipIngr.length){
+    //     potTime = false;
     
-    if(this.yPos < 300){
-    this.yPos++;
-    }
-
-    if(this.yPos == 300 && ingAdded.length == recipIngr.length){
-      potTime = false;
-      
-      endScreen = true;
-
-    }
+    //     endScreen = true;
+    // }
   }
+
+  updatePos() {
+      if(this.yOff < -60){
+          this.yOff += 1.5;
+          console.log(this.yOff);
+      }
+  }
+}
+
+function showInstr(){
+  push();
+    instructions.noStroke();
+    instructions.fill(blue);
+    instructions.rect(210, 400, 370, 47, 20)
+
+    instructions.textFont(menuFont);
+    instructions.textAlign(CENTER, CENTER);
+
+    instructions.fill(white);
+    instructions.textSize(16)
+    instructions.text('In this order, follow the instructions of the following pages: ', 400, 410);
+
+    instructions.textSize(27);
+    instructions.text(pageNom, 400, 427); // print page numbers
+    
+    rotateX(45);
+    translate(0, -70, 150);
+    texture(instructions);
+    plane(800, 500);
+  pop();
 }
 
 function setRecipe(){ // randomly generate recipe user needs to follow + come up with page numbers users need to flip to
@@ -329,21 +401,6 @@ function setRecipe(){ // randomly generate recipe user needs to follow + come up
   }
 
   convertToPageNom(); // choose page numbers that reference ingredients in the recipe
-}
-
-function showPot(){
-  fill(orange);
-  rect(330, 210, 170, 170, 20);
-  rect(300, 210, 230, 30, 20);
-}
-
-function showRecipe(){
-  fill(white);
-  textSize(32)
-  text('In this order, follow the instructions of the following pages: ', 400, 410);
-
-  textSize(60);
-  text(pageNom, 400, 450); // print page numbers
 }
 
 function convertToPageNom(){
@@ -392,6 +449,9 @@ function showEnd(){
   }
 }
 
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
