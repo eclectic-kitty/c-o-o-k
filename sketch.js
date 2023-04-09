@@ -56,7 +56,11 @@ let ingrNames = ['carrot', 'chicken', 'chile', 'milk', 'pomSeed', 'potato', 'ric
 let ingrImgs = []; // Array that will hold ingredient images
 let recipIngr = []; // Array that will hold a given recipe's ingredients
 let imgConsome, imgAdobo, imgChiles, imgHalo; // declaring variables for non-ingredient images
+
 let pot; // Variable for pot 3d model
+let broth;
+let version = 0;
+
 
 function preload() {
   menuFont = loadFont('assets/fonts/menu/CoveredByYourGrace-Regular.ttf'); // load fonts
@@ -73,6 +77,7 @@ function preload() {
   }
 
   pot = loadModel('assets/pooot.obj');
+  broth = loadModel('assets/broth.obj');
 }
 
 // declaring colours, other variables that need to be assigned values,
@@ -90,9 +95,9 @@ function setup() {
   lBlue = color(203, 243, 240);
   blue = color(48, 198, 182);
 
-  showMenu = true; // Display menu screen
+  showMenu = false; // Display menu screen
   ready = false;
-  potTime = false;
+  potTime = true;
   endScreen = false;
   camSetUp = false;
 
@@ -102,6 +107,21 @@ function setup() {
   for(let i = 0; i < 4; i++){ // create four buttons
     mButtonArray[i] = new MenuButtons(i);
   }
+
+  // for (let i = 0; i < bSize; i++) {
+  //   brothYs[i] = [];
+  // }
+
+  // let yOff = 0
+  // for (let y = 0; y < bSize; y++) {
+  //   let xOff = 0;
+  //   for (let x = 0; x < bSize; x++) {
+  //     brothYs[x][y] = map(noise(xOff, yOff), 0, 1, -bHLim, bHLim);
+  //     xOff += 1;
+  //   }
+  //   yOff += 1;
+  // }
+  // console.log(brothYs);
 }
 
 function draw() {
@@ -133,10 +153,12 @@ function draw() {
 
     showPot();
     
+    showBroth();
+
     for (let i = 0; i < ingAdded.length; i++) {
       ingAdded[i].updatePos();
       ingAdded[i].display();
-  }
+    }
 
     showInstr();
   }
@@ -144,7 +166,20 @@ function draw() {
   if(endScreen){
     showEnd();
   }
+}
+
+function mouseClicked() {
+  // randomly translate the vertices.
+  for (const v of broth.vertices) {
+    v.y += random(-1, 1);
+  }
+  console.log(broth.vertices);
+
+  broth.computeNormals();
   
+  // Update the geometry id so that the vertex buffer gets recreated
+  // Without this p5.js will reused the cached vertex buffer.
+  broth.gid = `broth-version-${version++}`;
 }
 
 // function mousePressed(){
@@ -291,7 +326,7 @@ class MenuButtons {
 
 }
 
-function showPot(){
+function showPot() {
   push();
     scale(5);
     shininess(2);
@@ -300,6 +335,21 @@ function showPot(){
     rotateY(90);
     rotateZ(180);
     model(pot);
+  pop();
+}
+
+function showBroth() {
+  push();
+    //stroke(255, 200, 200);
+    //strokeWeight(1);
+    shininess(5);
+    specularMaterial(100, 200, 200)
+    //ambientMaterial(100, 200, 200);
+    scale(5);
+    translate(0, 8, 0); // z: 350
+    rotateY(90);
+    rotateZ(180);
+    model(broth);
   pop();
 }
 
@@ -449,7 +499,12 @@ function showEnd(){
   }
 }
 
-
+function keyPressed() {
+  if (keyCode == LEFT_ARROW) {
+    test = new Ingredient(ingrNames[0], ingrImgs[0])
+    ingAdded.push(test);
+  }
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
