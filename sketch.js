@@ -29,7 +29,11 @@ let nextName = "phone"; // Who is next on the list? Make sure it matches the nex
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 
@@ -58,8 +62,12 @@ let recipIngr = []; // Array that will hold a given recipe's ingredients
 let imgConsome, imgAdobo, imgChiles, imgHalo; // declaring variables for non-ingredient images
 
 let pot; // Variable for pot 3d model
-let broth;
+let brothModel;
+
+//let broth;
 let version = 0;
+//let bNoiseX = 0;
+//let bNoiseY = 0;
 
 
 function preload() {
@@ -77,7 +85,7 @@ function preload() {
   }
 
   pot = loadModel('assets/pooot.obj');
-  broth = loadModel('assets/broth.obj');
+  brothModel = loadModel('assets/broth.obj');
 }
 
 // declaring colours, other variables that need to be assigned values,
@@ -107,21 +115,6 @@ function setup() {
   for(let i = 0; i < 4; i++){ // create four buttons
     mButtonArray[i] = new MenuButtons(i);
   }
-
-  // for (let i = 0; i < bSize; i++) {
-  //   brothYs[i] = [];
-  // }
-
-  // let yOff = 0
-  // for (let y = 0; y < bSize; y++) {
-  //   let xOff = 0;
-  //   for (let x = 0; x < bSize; x++) {
-  //     brothYs[x][y] = map(noise(xOff, yOff), 0, 1, -bHLim, bHLim);
-  //     xOff += 1;
-  //   }
-  //   yOff += 1;
-  // }
-  // console.log(brothYs);
 }
 
 function draw() {
@@ -151,9 +144,10 @@ function draw() {
     let lC = 60; 
     directionalLight(lC, lC, lC, -0.5, 1, -0.35) // for z axise, into the screen is lower numbers, out of the screen is higher
 
-    showPot();
+    drawPot();
     
-    showBroth();
+    broth.update();
+    broth.display();
 
     for (let i = 0; i < ingAdded.length; i++) {
       ingAdded[i].updatePos();
@@ -169,23 +163,17 @@ function draw() {
 }
 
 function mouseClicked() {
-  // randomly translate the vertices.
-  for (const v of broth.vertices) {
-    v.y += random(-1, 1);
-  }
-  console.log(broth.vertices);
-
-  broth.computeNormals();
-  
-  // Update the geometry id so that the vertex buffer gets recreated
-  // Without this p5.js will reused the cached vertex buffer.
-  broth.gid = `broth-version-${version++}`;
+  broth.update();
 }
 
-// function mousePressed(){
-//   // Sends a message on mouse pressed to test. You can use sendMQTTMessage(msg) at any time, it doesn't have to be on mouse pressed.
-//   sendMQTTMessage("howdy"); // This function takes 1 parameter, here I used a random number between 0 and 255 and constrained it to an integer. You can use anything you want.
-// }
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 
 function menuScreen(){
@@ -323,10 +311,19 @@ class MenuButtons {
       }
     }
   }
-
 }
 
-function showPot() {
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+function drawPot() {
   push();
     scale(5);
     shininess(2);
@@ -338,20 +335,40 @@ function showPot() {
   pop();
 }
 
-function showBroth() {
-  push();
-    //stroke(255, 200, 200);
-    //strokeWeight(1);
-    shininess(5);
-    specularMaterial(100, 200, 200)
-    //ambientMaterial(100, 200, 200);
-    scale(5);
-    translate(0, 8, 0); // z: 350
-    rotateY(90);
-    rotateZ(180);
-    model(broth);
-  pop();
+const broth = {
+  limit: 2,
+  agitation: 0.2,
+
+  display() {
+    push();
+      // stroke(255, 200, 200);
+      // strokeWeight(1);
+      shininess(8);
+      specularMaterial(100, 200, 200)
+      // ambientMaterial(100, 200, 200);
+      scale(5);
+      translate(0, 10, 0); // z: 350
+      rotateY(90);
+      rotateZ(180);
+      model(brothModel);
+    pop();
+  },
+
+  update() {
+    // randomly translate the vertices.
+    for (const v of brothModel.vertices) {
+      v.y += random(-this.agitation, this.agitation);
+      v.y = constrain(v.y, 15 - this.limit, 15 + this.limit)
+    }
+
+    brothModel.computeNormals();
+    
+    // Update the geometry id so that the vertex buffer gets recreated
+    // Without this p5.js will reused the cached vertex buffer.
+    brothModel.gid = `brothModel-version-${version++}`;
+  }
 }
+
 
 class Ingredient {
   constructor(name, img) {
@@ -506,7 +523,13 @@ function keyPressed() {
   }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 
