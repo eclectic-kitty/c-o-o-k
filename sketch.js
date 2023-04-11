@@ -38,14 +38,18 @@ let nextName = "phone"; // Who is next on the list? Make sure it matches the nex
 
 
 // declare colour variables
-let orange, lOrange, white, lBlue, blue;
+let orange, lOrange, white, lBlue, blue, yBrown, purple, black;
+
 
 let showMenu, ready, potTime, endScreen, camSetUp; // booleans
 
-let cam; // variable for the camera
+let Cam, endCam; // variable for the camera
 
 let menu; // variable for the menu's canvas
 let instructions; // variable for the in-game instructions' canvas
+let end; // vaariable for end screen
+
+let playerScore; // variable for calculating player score
 
 // declare font variables
 let menuFont;
@@ -102,15 +106,19 @@ function setup() {
   white = color(255);
   lBlue = color(203, 243, 240);
   blue = color(48, 198, 182);
+  yBrown = color(161, 135, 59),
+  purple = color(160, 103, 230),
+  black = color(0),
 
-  showMenu = false; // Display menu screen
+  showMenu = true; // Display menu screen
   ready = false;
-  potTime = true;
+  potTime = false;
   endScreen = false;
   camSetUp = false;
 
   menu = createGraphics(800, 500); // Sets up menu canvas
   instructions = createGraphics(800, 500); // Sets up in-game instructions' canvas
+  end = createGraphics(800, 500); // sets up end screen
 
   for(let i = 0; i < 4; i++){ // create four buttons
     mButtonArray[i] = new MenuButtons(i);
@@ -158,7 +166,13 @@ function draw() {
   }
 
   if(endScreen){
+    //cam.setPosition(0, 0, 0);
+    print("HELP");
+
+    background(orange);
     showEnd();
+    texture(end);
+    plane(800, 500);
   }
 }
 
@@ -338,14 +352,37 @@ function drawPot() {
 const broth = {
   limit: 2,
   agitation: 0.2,
+  change: 0,
+  change2: 0,
+  change3: 0,
 
   display() {
     push();
       // stroke(255, 200, 200);
       // strokeWeight(1);
       shininess(8);
-      specularMaterial(100, 200, 200)
-      // ambientMaterial(100, 200, 200);
+
+      let bad1 = lerpColor(orange, yBrown, this.change);
+      let bad2 = lerpColor(yBrown, purple, this.change2);
+      let bad3 = lerpColor(purple, black, this.change3);
+
+      if(playerScore < 30){ // if they get under 30% the correct ingredients, they fail
+        specularMaterial(bad3); // change to black
+        this.change3 += 0.005; // change the middle number so there's an animated gradient
+      }
+      else if (playerScore > 30 && playerScore < 50){ // if player gets 30-50% ingredients right
+        specularMaterial(bad2); // change to purple
+        this.change2 += 0.005;
+      }
+      else if (playerScore > 50 && playerScore < 75){ // if player has 50-75% right
+        specularMaterial(bad1); // change to yellowy brown intermediary
+        this.change += 0.005;
+      }
+      else{ // if player gets everything right
+        specularMaterial(orange); // orange
+      }
+    
+
       scale(5);
       translate(0, 10, 0); // z: 350
       rotateY(90);
@@ -391,17 +428,18 @@ class Ingredient {
       plane(100, 100);
     pop();
 
-    // if(this.yPos == 300 && ingAdded.length == recipIngr.length){
-    //     potTime = false;
-    
-    //     endScreen = true;
-    // }
+    if(this.yOff <= -60 && ingAdded.length == recipIngr.length){
+         potTime = false;
+         endScreen = true;
+         cam.setPosition(0, 0, 275);
+        // cam.tilt(0);
+    }
   }
 
   updatePos() {
       if(this.yOff < -60){
           this.yOff += 1.5;
-          console.log(this.yOff);
+          //print(this.yOff)
       }
   }
 }
@@ -420,6 +458,7 @@ function showInstr(){
     instructions.text('In this order, follow the instructions of the following pages: ', 400, 410);
 
     instructions.textSize(27);
+   // instructions.text(frameRate(), 400, 427)
     instructions.text(pageNom, 400, 427); // print page numbers
     
     rotateX(45);
@@ -478,16 +517,16 @@ function convertToPageNom(){
 
 function choosePage(ingr){ // check ingredient name
   if(ingr == "carrot"){
-    return int(random(13, 18)); // if ingredient is a carrot, return page number between 13-17
+    return int(random(14, 19)); // if ingredient is a carrot, return page number between 13-17
   }
   else if(ingr == "chicken"){
-    return int(random(18, 23)); // return page number
+    return int(random(19, 24)); // return page number
   }
   else if(ingr == "chile"){
-    return int(random(23, 28)); // return page number
+    return int(random(24, 29)); // return page number
   }
   else if(ingr == "milk"){
-    return int(random(28, 33)); // return page nom
+    return int(random(29, 33)); // return page nom
   }
   else if(ingr == "pomSeed"){
     return int(random(33, 38)); // return page nom
@@ -504,15 +543,25 @@ function choosePage(ingr){ // check ingredient name
 }
 
 function showEnd(){
-  if(wrongCounter > 0){
-    fill(white);
-    textSize(32)
-    text('you failed.', 400, 250);
+  playerScore = ((recipIngr.length - wrongCounter)/recipIngr.length) * 100; // calculate player score on a percentage
+
+  if(playerScore < 50){ // if they get under half the correct ingredients, they fail
+    end.fill(white);
+    end.textAlign(CENTER, CENTER);
+    end.textSize(32)
+    end.text('you failed.', 400, 250);
   }
-  else{
-    fill(white);
-    textSize(32)
-    text('you cooked food! good job.', 400, 250);
+  else if (playerScore > 50 && playerScore < 100){ // if player gets majority of ingredients right
+    end.fill(white);
+    end.textAlign(CENTER, CENTER);
+    end.textSize(32)
+    end.text('you cooked food! good job.', 400, 250);
+  }
+  else{ // if player gets everything right
+    end.fill(white);
+    end.textAlign(CENTER, CENTER);
+    end.textSize(32)
+    end.text('you made the best meal!\ngood job!!!\nyou are a cooking master!', 400, 250);
   }
 }
 
@@ -573,7 +622,9 @@ function onMessageArrived(message) {
         wrongCounter++;
       }
     }
-    console.log(wrongCounter);
+    console.log("ingredients wrong: " + wrongCounter);
+    print("ingredients added: " + ingAdded.length);
+    print("recipe length: " + recipIngr.length);
 }
 
 
