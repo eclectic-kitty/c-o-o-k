@@ -31,7 +31,9 @@ let nextName = "phone"; // Who is next on the list? Make sure it matches the nex
 
 
 
+// MQTT Setup above
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// Main setup + draw() below
 
 
 
@@ -55,9 +57,9 @@ let playerScore; // variable for calculating player score
 let menuFont;
 
 let mButtonArray = []; // declare array for menu buttons objects
-let recipe = [];
-let ingAdded = []; // ingredients added by other player, object array
-let wrongCounter = 0;
+let recipe = []; // Variable for recipe
+let ingrAdded = []; // ingredients added by other player, object array
+let wrongCounter = 0; // Variable for keeping track of player mistakes
 let pageNom = []; // array for what pages the user flips to
 
 let ingrNames = ['carrot', 'chicken', 'chile', 'milk', 'pomSeed', 'potato', 'rice', 'vinegar'];
@@ -66,12 +68,8 @@ let recipIngr = []; // Array that will hold a given recipe's ingredients
 let imgConsome, imgAdobo, imgChiles, imgHalo; // declaring variables for non-ingredient images
 
 let pot; // Variable for pot 3d model
-let brothModel;
-
-//let broth;
-let version = 0;
-//let bNoiseX = 0;
-//let bNoiseY = 0;
+let brothModel; // Variable for broth 3d model
+let version = 0; // Variable used in moving broth
 
 
 function preload() {
@@ -96,7 +94,7 @@ function preload() {
 // canvas and mqtt stuff
 // create four buttons
 function setup() {
-  createCanvas(800, 500, WEBGL);
+  createCanvas(800, 500, WEBGL); // Set up canvas
   angleMode(DEGREES);
   MQTTsetup(); // Setup the MQTT client
 
@@ -129,42 +127,47 @@ function draw() {
   noStroke();
   orbitControl();
 
+  // Draws menu screen
   if(showMenu){
     menu.background(orange);
     menuScreen();
-    texture(menu);
-    plane(800, 500);
+    texture(menu); // Sets menu canvas as texture
+    plane(800, 500); // Draws a plane, same size as screen
   }
 
+  // Draws pot screen
   if(potTime){
-
-    if (!camSetUp) {
-      cam = createCamera();
+    // Set camera position for pot screen
+    if (!camSetUp) { // Runs once
+      cam = createCamera(); // Creates new camera
       cam.setPosition(0, -300, 275)
       cam.tilt(45)
-      camSetUp = true;
+      camSetUp = true; // switches boolean so code runs once
     }
 
     background(lOrange);
 
-    // ambientLight(225);
-    ambientLight(200);
-    let lC = 60; 
-    directionalLight(lC, lC, lC, -0.5, 1, -0.35) // for z axise, into the screen is lower numbers, out of the screen is higher
+    // Sets up the lights
+    ambientLight(200); // Ambient light from all directions
+    let lC = 60; // Variable for directional light's intensity
+    directionalLight(lC, lC, lC, -0.5, 1, -0.35) // A directional light that shines towards the left, downwards, and forwards
 
-    drawPot();
+    drawPot(); // Draw pot
     
-    broth.update();
-    broth.display();
+    broth.bubble(); // Update broth shape
+    broth.display(); // Draw broth
 
-    for (let i = 0; i < ingAdded.length; i++) {
-      ingAdded[i].updatePos();
-      ingAdded[i].display();
+    // Displays each ingredient
+    for (let i = 0; i < ingrAdded.length; i++) {
+      ingrAdded[i].updatePos(); // Updates the ingredeint's position
+      ingrAdded[i].display(); // Draws ingredient
     }
 
+    // Draws instructions & pages
     showInstr();
   }
 
+  // Draws end screen
   if(endScreen){
     //cam.setPosition(0, 0, 0);
     print("HELP");
@@ -176,15 +179,14 @@ function draw() {
   }
 }
 
-function mouseClicked() {
-  broth.update();
-}
 
 
 
 
 
+// Main setup + draw() above
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// Menu screen code below
 
 
 
@@ -331,40 +333,42 @@ class MenuButtons {
 
 
 
+// Menu screen code above
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// Pot & end screen code below
 
 
 
 
 
 function drawPot() {
-  push();
+  push(); // Pushed and popped to make sure scale, translation, etc. doesn't affect other things drawn
     scale(5);
-    shininess(2);
-    specularMaterial(182, 219, 217);
-    translate(0, 8, 0); // z: 350
-    rotateY(90);
+    shininess(2); // Sets shininess of specularMaterial()
+    specularMaterial(182, 219, 217); // Sets a blue metallic material
+    translate(0, 8, 0); // Positions pot a little low
+    rotateY(90); // Rotates pot to face up (model by default did not)
     rotateZ(180);
-    model(pot);
+    model(pot); // Draws pot
   pop();
 }
 
+// Object for broth is defined
 const broth = {
   limit: 2,
-  agitation: 0.2,
+  bubbleSpeed: 0.2,
   change: 0,
   change2: 0,
   change3: 0,
 
+
   display() {
     push();
-      // stroke(255, 200, 200);
-      // strokeWeight(1);
-      shininess(8);
-
       let bad1 = lerpColor(orange, yBrown, this.change);
       let bad2 = lerpColor(yBrown, purple, this.change2);
       let bad3 = lerpColor(purple, black, this.change3);
+
+      shininess(8); // Sets a low shininess for specularMaterial()
 
       if(playerScore < 30){ // if they get under 30% the correct ingredients, they fail
         specularMaterial(bad3); // change to black
@@ -381,24 +385,25 @@ const broth = {
       else{ // if player gets everything right
         specularMaterial(orange); // orange
       }
-    
 
-      scale(5);
-      translate(0, 10, 0); // z: 350
+      scale(5); // Translate, rotate, and scale are the same as the pot 
+      translate(0, 10, 0); 
       rotateY(90);
       rotateZ(180);
-      model(brothModel);
+      model(brothModel); // Draws broth
     pop();
   },
 
-  update() {
-    // randomly translate the vertices.
-    for (const v of brothModel.vertices) {
-      v.y += random(-this.agitation, this.agitation);
-      v.y = constrain(v.y, 15 - this.limit, 15 + this.limit)
+  // "Bubbles" broth, randomly moves vertices along y position
+  // This code mostly is an edited version of code from:
+  // https://stackoverflow.com/questions/74291143/how-do-i-access-vertex-coordinates-of-an-obj-model-in-p5-js
+  bubble() {
+    for (const v of brothModel.vertices) { // For each vertex in broth
+      v.y += random(-this.bubbleSpeed, this.bubbleSpeed); // Move along y axis a random amount, limited by set speed
+      v.y = constrain(v.y, 15 - this.limit, 15 + this.limit) // Constrains broth's y position to a certain height & depth
     }
 
-    brothModel.computeNormals();
+    brothModel.computeNormals(); // Updates the normals for lighting calculations
     
     // Update the geometry id so that the vertex buffer gets recreated
     // Without this p5.js will reused the cached vertex buffer.
@@ -406,26 +411,25 @@ const broth = {
   }
 }
 
-
+// Class for ingredients
 class Ingredient {
   constructor(name, img) {
-      this.name = name;
-      this.img = createGraphics(100, 100);
-      this.img.image(img, 0, 0, 100, 100);
+      this.name = name; // Sets name of ingredient
+      this.img = createGraphics(100, 100); // Creates canvas for ingredient image
+      this.img.image(img, 0, 0, 100, 100); // Sets image
       
-      this.xOff = random(-60, 60);
-      this.yOff = -280; //-280
-      this.zOff = random(-60, 60);
-
-      this.size = 150;
+      this.xOff = random(-60, 60); // Sets a random x position, within pot
+      this.yOff = -280; // Sets y position just above where visible
+      this.zOff = map(ingrAdded.length + 1, 1, recipIngr.length, -60, 60 ); // Sets y position 
+      // The y position is set according to how many ingredients there currently are
   }
 
   display() {
     push();
-      translate(this.xOff, this.yOff, this.zOff)
-      texture(this.img);
+      translate(this.xOff, this.yOff, this.zOff) // Sets ingredient position
+      texture(this.img); // Sets image canvas as texture for ingredient's place
       //fill(255);
-      plane(100, 100);
+      plane(100, 100); // Draws ingredient plane
     pop();
 
     if(this.yOff <= -60 && ingAdded.length == recipIngr.length){
@@ -436,10 +440,10 @@ class Ingredient {
     }
   }
 
+  // Updates ingredient position
   updatePos() {
-      if(this.yOff < -60){
+      if(this.yOff < -60){ // As long as ingredient is above final position
           this.yOff += 1.5;
-          //print(this.yOff)
       }
   }
 }
@@ -568,16 +572,16 @@ function showEnd(){
 function keyPressed() {
   if (keyCode == LEFT_ARROW) {
     test = new Ingredient(ingrNames[0], ingrImgs[0])
-    ingAdded.push(test);
+    ingrAdded.push(test);
   }
 }
 
 
 
 
-
+// Pot & end screen code above
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
+// MQTT code below
 
 
 
@@ -612,13 +616,13 @@ function onMessageArrived(message) {
     for (let i = 0; i < ingrNames.length; i++) {
       console.log(ingrReceived + ', ' + ingrNames[i]);
       if (ingrReceived == ingrNames[i]) {
-        ingAdded.push(new Ingredient(ingrReceived, ingrImgs[i])); // add to object array
+        ingrAdded.push(new Ingredient(ingrReceived, ingrImgs[i])); // add to object array
       }
     }
 
-    if (ingAdded.length != recipIngr.length){
-      let i = ingAdded.length;
-      if (ingAdded[i-1].name != recipIngr[i-1]) {
+    if (ingrAdded.length != recipIngr.length){
+      let i = ingrAdded.length;
+      if (ingrAdded[i-1].name != recipIngr[i-1]) {
         wrongCounter++;
       }
     }
@@ -632,25 +636,25 @@ function onMessageArrived(message) {
 
 // Callback functions
 function onConnect() {
-client.subscribe(topic);
-console.log("connected");
-// is working
+  client.subscribe(topic);
+  console.log("connected");
+  // is working
 }
 
 function onConnectionLost(response) {
-if (response.errorCode !== 0) {
-// If it stops working
-}
+  if (response.errorCode !== 0) {
+  // If it stops working
+  }
 }
 
 function MQTTsetup(){
-client = new Paho.MQTT.Client(broker.hostname, Number(broker.port), creds.clientID);
-client.onConnectionLost = onConnectionLost;
-client.onMessageArrived = onMessageArrived;
-client.connect({
+  client = new Paho.MQTT.Client(broker.hostname, Number(broker.port), creds.clientID);
+  client.onConnectionLost = onConnectionLost;
+  client.onMessageArrived = onMessageArrived;
+  client.connect({
     onSuccess: onConnect,
-userName: creds.userName, // username
-password: creds.password, // password
-useSSL: true
-});
+    userName: creds.userName, // username
+    password: creds.password, // password
+    useSSL: true
+  });
 }
