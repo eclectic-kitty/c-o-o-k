@@ -45,7 +45,7 @@ let orange, lOrange, white, lBlue, blue, yBrown, purple, black;
 
 let showMenu, ready, potTime, endScreen, camSetUp; // booleans
 
-let Cam, endCam; // variable for the camera
+let potCam, endCam; // variable for the camera
 
 let menu; // variable for the menu's canvas
 let instructions; // variable for the in-game instructions' canvas
@@ -71,10 +71,13 @@ let pot; // Variable for pot 3d model
 let brothModel; // Variable for broth 3d model
 let version = 0; // Variable used in moving broth
 
+let initialTime, timelimit; // variables for timer
 
+//loading assets
 function preload() {
   menuFont = loadFont('assets/fonts/menu/CoveredByYourGrace-Regular.ttf'); // load fonts
 
+  // load images for recipes
   imgConsome = loadImage('assets/foods/consome.png');
   imgAdobo = loadImage('assets/foods/adobo.png');
   imgChiles = loadImage('assets/foods/chiles.png');
@@ -86,6 +89,7 @@ function preload() {
     ingrImgs.push(img);
   }
 
+  // load 3d assets
   pot = loadModel('assets/pooot.obj');
   brothModel = loadModel('assets/broth.obj');
 }
@@ -109,10 +113,10 @@ function setup() {
   black = color(0),
 
   showMenu = true; // Display menu screen
-  ready = false;
-  potTime = false;
-  endScreen = false;
-  camSetUp = false;
+  ready = false; // variable to see if game can begin
+  potTime = false; // display pot shared screen boolean
+  endScreen = false; // display end screen boolean
+  camSetUp = false; 
 
   menu = createGraphics(800, 500); // Sets up menu canvas
   instructions = createGraphics(800, 500); // Sets up in-game instructions' canvas
@@ -139,9 +143,9 @@ function draw() {
   if(potTime){
     // Set camera position for pot screen
     if (!camSetUp) { // Runs once
-      cam = createCamera(); // Creates new camera
-      cam.setPosition(0, -300, 275)
-      cam.tilt(45)
+      potCam = createCamera(); // Creates new camera
+      potCam.setPosition(0, -300, 275)
+      potCam.tilt(45)
       camSetUp = true; // switches boolean so code runs once
     }
 
@@ -169,8 +173,7 @@ function draw() {
 
   // Draws end screen
   if(endScreen){
-    //cam.setPosition(0, 0, 0);
-    print("HELP");
+    endCam = createCamera(); // Creates new camera to reset perspective
 
     background(orange);
     showEnd();
@@ -257,6 +260,10 @@ function startButton(){
       showMenu = false; // get rid of menu
       potTime = true; // show pot
       sendMQTTMessage("start!"); // tell other person to start
+
+      // set timer variables for game timer
+      initialTime = int(millis()/1000); // Declare time at this moment
+      timeLimit = initialTime + ((recipIngr.length) * 20); // Twenty seconds per ingredient
 
     }
   }
@@ -363,7 +370,10 @@ const broth = {
 
 
   display() {
+    calculateScore(); // constantly checking player's score
+
     push();
+      // declare lerp colours for varying stages of "badness"
       let bad1 = lerpColor(orange, yBrown, this.change);
       let bad2 = lerpColor(yBrown, purple, this.change2);
       let bad3 = lerpColor(purple, black, this.change3);
@@ -374,13 +384,13 @@ const broth = {
         specularMaterial(bad3); // change to black
         this.change3 += 0.005; // change the middle number so there's an animated gradient
       }
-      else if (playerScore > 30 && playerScore < 50){ // if player gets 30-50% ingredients right
+      else if (playerScore >= 30 && playerScore < 50){ // if player gets 30-50% ingredients right
         specularMaterial(bad2); // change to purple
-        this.change2 += 0.005;
+        this.change2 += 0.005; // animates the gradient
       }
-      else if (playerScore > 50 && playerScore < 75){ // if player has 50-75% right
+      else if (playerScore >= 50 && playerScore < 75){ // if player has 50-75% right
         specularMaterial(bad1); // change to yellowy brown intermediary
-        this.change += 0.005;
+        this.change += 0.005; // animates the gradient
       }
       else{ // if player gets everything right
         specularMaterial(orange); // orange
@@ -432,11 +442,11 @@ class Ingredient {
       plane(100, 100); // Draws ingredient plane
     pop();
 
-    if(this.yOff <= -60 && ingAdded.length == recipIngr.length){
+
+    if(this.yOff >= -60 && this == ingrAdded[recipIngr.length - 1]){ // check if ingredient has fallen to the bottom of the pot + is the last ingredient in the recipe
+        print("THIS: " + this.yOff);
          potTime = false;
          endScreen = true;
-         cam.setPosition(0, 0, 275);
-        // cam.tilt(0);
     }
   }
 
@@ -462,8 +472,25 @@ function showInstr(){
     instructions.text('In this order, follow the instructions of the following pages: ', 400, 410);
 
     instructions.textSize(27);
-   // instructions.text(frameRate(), 400, 427)
+    //instructions.text(frameRate(), 400, 427)
     instructions.text(pageNom, 400, 427); // print page numbers
+
+    // TIMER STUFF
+    let currentTime = int(millis()/1000); // Take same time
+    let countdown = timeLimit - currentTime; // current time detracted from set value + added time limit
+
+    instructions.fill(blue);
+    instructions.circle(640, 150, 200);
+    instructions.textAlign(RIGHT, CENTER);
+    instructions.fill(white); // display timer
+    instructions.textSize(60);
+    instructions.text(countdown, 625, 175);
+
+    if(countdown == 0){
+      potTime = false;
+      endScreen = true;
+    }
+
     
     rotateX(45);
     translate(0, -70, 150);
@@ -546,27 +573,49 @@ function choosePage(ingr){ // check ingredient name
   }
 }
 
+// function to calculate player score, runs to display feedback on pot
+// also runs at end to calculate level of achievement
+function calculateScore(){
+  if(endScreen){
+    let ingrMissed = recipIngr.length - ingrAdded.length; // count how many ingredients were missed if timer runs out
+    playerScore = ((recipIngr.length - wrongCounter - ingrMissed)/recipIngr.length); // calculate player score on a percentage, right ingredients div by nomOfIngr
+    playerScore *= 100; // make into percentage
+  }
+  else{
+    playerScore = ((recipIngr.length - wrongCounter)/recipIngr.length); // calculate player score on a percentage, right ingredients div by nomOfIngr
+    playerScore *= 100; // make into percentage
+  }
+
+}
+
 function showEnd(){
-  playerScore = ((recipIngr.length - wrongCounter)/recipIngr.length) * 100; // calculate player score on a percentage
+
+  calculateScore(); // recalculate score
 
   if(playerScore < 50){ // if they get under half the correct ingredients, they fail
+
     end.fill(white);
     end.textAlign(CENTER, CENTER);
     end.textSize(32)
-    end.text('you failed.', 400, 250);
+    end.text('you failed miserably.', 400, 250);
   }
-  else if (playerScore > 50 && playerScore < 100){ // if player gets majority of ingredients right
+  else if (playerScore < 100 && playerScore >= 50){ // if player gets majority of ingredients right
+    print("mid");
+
     end.fill(white);
     end.textAlign(CENTER, CENTER);
     end.textSize(32)
-    end.text('you cooked food! good job.', 400, 250);
+    end.text("you cooked food! it's edible. good job.", 400, 250);
   }
-  else{ // if player gets everything right
+  else { // if player gets everything right
+    print("WOO");
+
     end.fill(white);
     end.textAlign(CENTER, CENTER);
     end.textSize(32)
     end.text('you made the best meal!\ngood job!!!\nyou are a cooking master!', 400, 250);
   }
+
 }
 
 function keyPressed() {
@@ -574,7 +623,12 @@ function keyPressed() {
     test = new Ingredient(ingrNames[0], ingrImgs[0])
     ingrAdded.push(test);
   }
+    let i = ingrAdded.length;
+    if (ingrAdded[i-1].name != recipIngr[i-1]) {
+      wrongCounter++;
+    }
 }
+
 
 
 
@@ -627,7 +681,7 @@ function onMessageArrived(message) {
       }
     }
     console.log("ingredients wrong: " + wrongCounter);
-    print("ingredients added: " + ingAdded.length);
+    print("ingredients added: " + ingrAdded.length);
     print("recipe length: " + recipIngr.length);
 }
 
