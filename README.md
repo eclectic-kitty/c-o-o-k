@@ -26,13 +26,13 @@ In order to play the game, you need two laptops with the file downloaded on both
 
 The laptop meant to be the shared screen should have:
 ```
-<script src="sketch.js"></script>
+<script src="pot.js"></script>
 ```
 in line 13 of the index.html file. 
 
 The laptop meant to be Player 2's screen should have:
 ```
-<script src="phone.js"></script>
+<script src="pantry.js"></script>
 ```
 in line 13 of the index.html file.
 
@@ -45,7 +45,7 @@ In terms of our selection, we originally had the idea of having Player 2's scree
 
 We also wanted to add more ingredients, either as decoys or as ingredients themselves but sadly didn't get to finish it in time.
 
-It was also suggested to add some flavour text and some background as to why players were playing the game, which we would've loved to add in future iterations. Music would've also been fun to add to contribute to the atmosphere of the game.
+It was also suggested to add some flavour text and some background as to why players were playing the game, which we would've loved to add in future iterations. Music and other sound design would've also been fun to add to contribute to the atmosphere of the game.
 
 -------------------------------------------------------------
 
