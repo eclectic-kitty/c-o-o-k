@@ -6,7 +6,7 @@ Aurora Becerra Granados & Abigail Lopez
 
 ![menu](screenshots/menu.png)
 ![pot](screenshots/potReal.png)
-![end](screenshots/end.png)
+![end](screenshots/endScreen.png)
 
 ### Intro:
 For our final project, we've made an asymmetric, multiplayer cooking game simply called "c o o k". The game is played with two players who have to work together and communicate in order to follow a game-generated recipe. 
