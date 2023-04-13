@@ -66,6 +66,8 @@ let ingrNames = ['carrot', 'chicken', 'chile', 'milk', 'pomSeed', 'potato', 'ric
 let ingrImgs = []; // Array that will hold ingredient images
 let recipIngr = []; // Array that will hold a given recipe's ingredients
 let imgConsome, imgAdobo, imgChiles, imgHalo; // declaring variables for non-ingredient images
+let badConsome, badAdobo, badChiles, badHalo; 
+let goodConsome, goodAdobo, goodChiles, goodHalo;
 
 let pot; // Variable for pot 3d model
 let brothModel; // Variable for broth 3d model
@@ -83,6 +85,16 @@ function preload() {
   imgAdobo = loadImage('assets/foods/adobo.png');
   imgChiles = loadImage('assets/foods/chiles.png');
   imgHalo = loadImage('assets/foods/haloHalo.png');
+
+  badConsome = loadImage('assets/foods/consomeBad.png');
+  badAdobo = loadImage('assets/foods/adoboBad.png');
+  badChiles = loadImage('assets/foods/chilesBad.png');
+  badHalo = loadImage('assets/foods/haloHaloBad.png');
+
+  goodConsome = loadImage('assets/foods/consomeGood.png');
+  goodAdobo = loadImage('assets/foods/adoboGood.png');
+  goodChiles = loadImage('assets/foods/chilesGood.png');
+  goodHalo = loadImage('assets/foods/haloHaloGood.png');
 
   // Load ingredient images
   for (let i = 0; i < ingrNames.length; i++) {
@@ -605,19 +617,70 @@ function showEnd(){
     end.fill(white);
     end.textAlign(CENTER, CENTER);
     end.textSize(32)
-    end.text('you failed miserably.', 400, 250);
-  }
+    end.text('you failed miserably.', 400, 100);
+
+    if(mButtonArray[0].selected){ // if consome was selected
+      badConsome.resize(300, 300);
+      end.image(badConsome, 250, 150); // bad consome de pollo pic
+    }
+    if(mButtonArray[1].selected){ // if adobo was selected
+      badAdobo.resize(300, 300);
+      end.image(badAdobo, 250, 150); // bad adobo pic
+    }
+    if(mButtonArray[2].selected){ // if halo halo was selected
+      badHalo.resize(300, 300);
+      end.image(badHalo, 250, 150); // bad halo halo pic
+    }
+    if(mButtonArray[3].selected){ // if chiles was selected
+      badChiles.resize(300, 300);
+      end.image(badChiles, 250, 150); // bad halo halo pic
+    }
+  } 
   else if (playerScore < 100 && playerScore >= 50){ // if player gets majority of ingredients right
     end.fill(white);
     end.textAlign(CENTER, CENTER);
     end.textSize(32)
-    end.text("you cooked food! it's edible. good job.", 400, 250);
+    end.text("you cooked food! it's edible. good job.", 400, 100);
+
+    if(mButtonArray[0].selected){ // if consome was selected
+      imgConsome.resize(300, 300);
+      end.image(imgConsome, 250, 150); // normal consome de pollo pic
+    }
+    if(mButtonArray[1].selected){ // if adobo was selected
+      imgAdobo.resize(300, 300);
+      end.image(imgAdobo, 250, 150); // normal adobo pic
+    }
+    if(mButtonArray[2].selected){ // if halo halo was selected
+      imgHalo.resize(300, 300);
+      end.image(imgHalo, 250, 150); // normal halo halo pic
+    }
+    if(mButtonArray[3].selected){ // if chiles was selected
+      imgChiles.resize(300, 300);
+      end.image(imgChiles, 250, 150); // normal halo halo pic
+    }
   }
   else { // if player gets everything right
     end.fill(white);
     end.textAlign(CENTER, CENTER);
     end.textSize(32)
-    end.text('you made the best meal!\ngood job!!!\nyou are a cooking master!', 400, 250);
+    end.text('you made the best meal!\ngood job!!!\nyou are a cooking master!', 400, 100);
+  
+    if(mButtonArray[0].selected){ // if consome was selected
+      goodConsome.resize(300, 300);
+      end.image(goodConsome, 250, 175); // good consome de pollo pic
+    }
+    if(mButtonArray[1].selected){ // if adobo was selected
+      goodAdobo.resize(300, 300);
+      end.image(goodAdobo, 250, 175); // good adobo pic
+    }
+    if(mButtonArray[2].selected){ // if halo halo was selected
+      goodHalo.resize(300, 300);
+      end.image(goodHalo, 250, 175); // good halo halo pic
+    }
+    if(mButtonArray[3].selected){ // if chiles was selected
+      goodChiles.resize(300, 300);
+      end.image(goodChiles, 250, 175); // good halo halo pic
+    }
   }
 
 }

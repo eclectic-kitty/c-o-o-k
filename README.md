@@ -6,6 +6,7 @@ Aurora Becerra Granados & Abigail Lopez
 
 ![menu](screenshots/menu.png)
 ![pot](screenshots/potReal.png)
+![end](screenshots/end.png)
 
 ### Intro:
 For our final project, we've made an asymmetric, multiplayer cooking game simply called "c o o k". The game is played with two players who have to work together and communicate in order to follow a game-generated recipe. 
@@ -41,6 +42,8 @@ When both players want to start the game, open it up on your respective IDE (we'
 
 ### Future iterations:
 In terms of our selection, we originally had the idea of having Player 2's screen be on a phone. We also wanted the selection to be much more whimsical; in order to send ingredients, Player 2 had to swipe on their screen and "shoot" the ingredients towards the pot.
+
+We also wanted to add more ingredients, either as decoys or as ingredients themselves but sadly didn't get to finish it in time.
 
 It was also suggested to add some flavour text and some background as to why players were playing the game, which we would've loved to add in future iterations. Music would've also been fun to add to contribute to the atmosphere of the game.
 
