@@ -27,6 +27,8 @@ future iterations:
 
 sketches, ideas
 
-credits, resources, etc
+credits, resources, etc:
+- Ten seconds left audio from https://www.youtube.com/watch?v=5mvPVKYMc6Q&t=11s
+
 
 anything else
