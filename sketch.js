@@ -71,7 +71,8 @@ let pot; // Variable for pot 3d model
 let brothModel; // Variable for broth 3d model
 let version = 0; // Variable used in moving broth
 
-let initialTime, timelimit; // variables for timer
+let initialTime, timelimit, countdown, tenSecsLeft = true; // variables for timer
+let timerSound; // off of youtube https://www.youtube.com/watch?v=5mvPVKYMc6Q&t=11s
 
 //loading assets
 function preload() {
@@ -92,6 +93,9 @@ function preload() {
   // load 3d assets
   pot = loadModel('assets/pooot.obj');
   brothModel = loadModel('assets/broth.obj');
+
+  // load audio
+  timerSound = loadSound('assets/sounds/danger.mp3');
 }
 
 // declaring colours, other variables that need to be assigned values,
@@ -264,7 +268,6 @@ function startButton(){
       // set timer variables for game timer
       initialTime = int(millis()/1000); // Declare time at this moment
       timeLimit = initialTime + ((recipIngr.length) * 20); // Twenty seconds per ingredient
-
     }
   }
 
@@ -476,19 +479,23 @@ function showInstr(){
     instructions.text(pageNom, 400, 427); // print page numbers
 
     // TIMER STUFF
-    let currentTime = int(millis()/1000); // Take same time
-    let countdown = timeLimit - currentTime; // current time detracted from set value + added time limit
+    let currentTime = int(millis()/1000); // Take same time, needs to run in draw so that it updates
+    countdown = timeLimit - currentTime; // current time detracted from set value + added time limit
+
+    if(countdown == 10 && tenSecsLeft){ // if ten seconds left on the clock + boolean to make it run only once
+      playTimerNoise(); // play timer noise
+    }
 
     instructions.fill(blue);
     instructions.circle(640, 150, 200);
     instructions.textAlign(RIGHT, CENTER);
     instructions.fill(white); // display timer
     instructions.textSize(60);
-    instructions.text(countdown, 625, 175);
+    instructions.text(countdown, 625, 175); // print countdown
 
-    if(countdown == 0){
-      potTime = false;
-      endScreen = true;
+    if(countdown == 0){ // ends game if player doesn't finish recipe in time
+      potTime = false; // stop showing pot
+      endScreen = true; // start showing end screen
     }
 
     
@@ -499,17 +506,18 @@ function showInstr(){
   pop();
 }
 
+function playTimerNoise(){
+  if(tenSecsLeft){ // if ten seconds are left
+  timerSound.play(); // play sound to warn players 10 seconds are left
+  tenSecsLeft = false; // boolean false so that it only runs once
+  }
+}
+
 function setRecipe(){ // randomly generate recipe user needs to follow + come up with page numbers users need to flip to
   recipIngr = shuffle(ingrNames); // shuffle array commented out for now, see if people want to have randomized/cute zine recipe book?
 
   print("og recipe = " + ingrNames); // print og recipe
   print("shuffled array = " + recipIngr); // print shuffled recipe
-
-  // let nomOfIng; // variable to determine how many ingredients should be in the recipe.. 
-                // each dish corresponds to a different difficulty
-
-  // if(mButtonArray[0].selected){ // consome de pollo will only have 3 ingredients that need to be chosen
-  //   recipIngr = ['carrot', 'chicken', 'chile'];            // if statement will be changed post playtest to include other dishes.
    
   if(mButtonArray[0].selected){ // if consome pollo is selected
     for(let i = 0; i < 5; i++){ // will only have 3 ingredients, therefore pop array 5 times
@@ -589,7 +597,7 @@ function calculateScore(){
 }
 
 function showEnd(){
-
+  timerSound.pause(); // stop audio if still playing
   calculateScore(); // recalculate score
 
   if(playerScore < 50){ // if they get under half the correct ingredients, they fail
@@ -600,16 +608,12 @@ function showEnd(){
     end.text('you failed miserably.', 400, 250);
   }
   else if (playerScore < 100 && playerScore >= 50){ // if player gets majority of ingredients right
-    print("mid");
-
     end.fill(white);
     end.textAlign(CENTER, CENTER);
     end.textSize(32)
     end.text("you cooked food! it's edible. good job.", 400, 250);
   }
   else { // if player gets everything right
-    print("WOO");
-
     end.fill(white);
     end.textAlign(CENTER, CENTER);
     end.textSize(32)
