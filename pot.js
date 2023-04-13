@@ -103,8 +103,8 @@ function preload() {
   }
 
   // load 3d assets
-  pot = loadModel('assets/pooot.obj');
-  brothModel = loadModel('assets/broth.obj');
+  pot = loadModel('assets/3dModels/pooot.obj');
+  brothModel = loadModel('assets/3dModels/broth.obj');
 
   // load audio
   timerSound = loadSound('assets/sounds/danger.mp3');

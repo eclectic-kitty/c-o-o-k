@@ -55,9 +55,9 @@ function preload() {
   }
 
   // Load  models
-  pantry = loadModel('assets/pantry.obj');
-  hinges = loadModel('assets/hinges.obj');
-  door = loadModel('assets/door.obj');
+  pantry = loadModel('assets/3dModels/pantry.obj');
+  hinges = loadModel('assets/3dModels/hinges.obj');
+  door = loadModel('assets/3dModels/door.obj');
 }
 
 function setup() {
