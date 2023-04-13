@@ -1,9 +1,0 @@
-carrot
-chicken
-chile
-fauxCarrot
-milk
-pomSeed
-potato
-rice
-vinegar
