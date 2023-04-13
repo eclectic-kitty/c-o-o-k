@@ -24,12 +24,16 @@ let myName = "phone"; // Who are you? Make sure it matches the previous person's
 let nextName = "display"; // Who is next on the list? Make sure it matches the next person's variable!
 
 
+// declare colour variables
+let orange, lOrange, white, lBlue, blue, yBrown, purple, black;
 
 let ingredients = [];
-let ingrNames = ['carrot', 'chicken', 'chile', 'milk', 'pomSeed', 'potato', 'rice', 'vinegar'];
+let ingrNames = ['carrot', 'chicken', 'chile', 'milk', 'pomSeed', 'potato', 'rice', 'vinegar', 'blank'];
 let ingrImgs = [];
 let started = false;
-//let ingrImgs = {carrot: 0, chicken: 0, chile: 0, milk: 0, pomSeed: 0, potato: 0, rice: 0, vinegar: 0};
+let pantry;
+let hinges;
+let door;
 
 function preload() {
   // Load ingredient images
@@ -37,30 +41,67 @@ function preload() {
     let img = loadImage('/assets/ingredients/' + ingrNames[i] + '.png');
     ingrImgs.push(img);
   }
+
+  pantry = loadModel('assets/pantry.obj');
+  hinges = loadModel('assets/hinges.obj');
+  door = loadModel('assets/door.obj');
 }
 
 function setup() {
+  createCanvas(windowWidth, windowHeight, WEBGL);
   frameRate(30);
-  noSmooth();
-  createCanvas(windowWidth, windowHeight);
+  ellipseMode(CORNER)
+  angleMode(DEGREES)
   MQTTsetup(); // Setup the MQTT client
 
-  console.log(width + ', ' + height);
+  blue = color(48, 198, 182);
 }
 
 function draw() {
-  if (started && ingredients.length == 0) { spawnIngredients() }
+  noStroke();
 
-  background(48, 198, 182);
-  for (let i = 0; i < ingredients.length; i++) {
-    ingredients[i].drawIngr();
+  background(blue);
+
+  if (started) {
+    if (ingredients.length == 0) { 
+      spawnIngredients(); 
+    }
+
+    ambientLight(200);
+    let lC = 255; // Variable for directional light's intensity
+    directionalLight(lC, lC, lC, -0.5, 1, -0.45) // A directional light that shines towards the left, downwards, and forwards
+
+    push();
+      scale(19, 16, 16);
+      translate(-7, -20.5, -5);
+      rotateX(-90)
+      ambientMaterial(190, 115, 10);
+      model(pantry);
+      model(door);
+
+      shininess(3); // Sets shininess of specularMaterial()
+      specularMaterial(182, 219, 217); // Sets a blue metallic material
+      model(hinges);
+    pop();
+
+    for (let i = 0; i < ingredients.length; i++) {
+      ingredients[i].drawIngr();
+    }
   }
 }
 
 function spawnIngredients() {
-  for (let i = 0; i < ingrNames.length; i++) {
-    let ingr = new Ingredient(ingrNames[i], ingrImgs[i]);
-    ingredients.push(ingr);
+  // for (let i = 0; i < ingrNames.length; i++) {
+  //   let ingr = new Ingredient(ingrNames[i], ingrImgs[i]);
+  //   ingredients.push(ingr);
+  // }
+  let i = 0;
+  for (let x = 0; x < 3; x++) {
+    for (let y = 0; y < 3; y++) {
+      let ingr = new Ingredient(ingrNames[i], ingrImgs[i], x, y);
+      ingredients.push(ingr);
+      i++;
+    }
   }
 }
 
@@ -71,26 +112,37 @@ function mouseClicked() {
 }
 
 class Ingredient {
-  constructor (name, img) {
+  constructor (name, img, x, y) {
+    console.log(name)
     this.name = name;
-    this.img = img;
-    this.size = 2.5;
+    this.img = createGraphics(100, 100);
+    this.img.image(img, 0, 0, 100, 100); // Sets image
+    this.size = 250;
     
-    this.x = random(width - 100 * this.size);
-    this.y = random(height - 100 * this.size);
+    this.xOff = (x-1) * 190;
+    this.x = width/2 + this.xOff
+    this.yOff = (y-1) * 220;
+    this.y = height/2 + this.yOff
+    console.log(width/2 + ' + ' + this.xOff + ', ' + height/2 + ' + ' + this.yOff)
+    console.log(this.x + ', ' + this.y)
 
     this.held = false;
   }
 
   drawIngr() {
     if (!this.held) {
-      image(this.img, this.x, this.y, 100*this.size, 100*this.size);
+      push();
+        translate(this.xOff, this.yOff, 0);
+        scale(1.8);
+        texture(this.img);
+        plane(100, 100);
+      pop();
     }
   }
 
   touchedCheck(touchX, touchY) {
-    if (!this.held && touchX > this.x && touchX < this.x + 100*this.size && touchY > this.y && touchY < this.y + 100*this.size) {
-      sendMQTTMessage(this.name)
+    if (!this.held && touchX > this.x - 80 && touchX < this.x + 80 && touchY > this.y - 80 && touchY < this.y + 80) {
+      sendMQTTMessage(this.name);
       this.held = true;
     }
   }
