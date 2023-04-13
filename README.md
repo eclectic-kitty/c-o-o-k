@@ -5,6 +5,7 @@ Concordia University
 Aurora Becerra Granados & Abigail Lopez
 
 ![menu](screenshots/menu.png)
+![pot](screenshots/potReal.png)
 
 ### Intro:
 For our final project, we've made an asymmetric, multiplayer cooking game simply called "c o o k". The game is played with two players who have to work together and communicate in order to follow a game-generated recipe. 
@@ -24,17 +25,13 @@ In order to play the game, you need two laptops with the file downloaded on both
 
 The laptop meant to be the shared screen should have:
 ```
-{
 <script src="sketch.js"></script>
-}
 ```
 in line 13 of the index.html file. 
 
 The laptop meant to be Player 2's screen should have:
 ```
-{
 <script src="phone.js"></script>
-}
 ```
 in line 13 of the index.html file.
 
