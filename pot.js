@@ -731,13 +731,13 @@ function sendMQTTMessage(msg) {
 
 // When a message arrives, do this:
 function onMessageArrived(message) {
-  print("Message Received:");
-  print(message.payloadString); // Print the incoming message
-  // sentIngredient = message;
+  // print("Message Received:");
+  // print(message.payloadString); // Print the incoming message
+  // // sentIngredient = message;
 
   let dataReceive = split(trim(message.payloadString), "/");// Split the incoming message into an array deliniated by "/"
-  console.log("Message for:");
-  console.log(String(dataReceive[1]));
+ // console.log("Message for:");
+ // console.log(String(dataReceive[1]));
   // 0 is who its from
   // 1 is who its for
   // 2 is the data
