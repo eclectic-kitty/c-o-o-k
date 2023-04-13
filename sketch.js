@@ -145,7 +145,6 @@ function setup() {
 
 function draw() {
   noStroke();
-  orbitControl();
 
   // Draws menu screen
   if(showMenu){
@@ -447,6 +446,8 @@ class Ingredient {
       this.yOff = -280; // Sets y position just above where visible
       this.zOff = map(ingrAdded.length + 1, 1, recipIngr.length, -60, 60 ); // Sets y position 
       // The y position is set according to how many ingredients there currently are
+
+      this.bobDir = 'fall'; // Direction for ingredient bobbing
   }
 
   display() {
@@ -458,7 +459,7 @@ class Ingredient {
     pop();
 
 
-    if(this.yOff >= -60 && this == ingrAdded[recipIngr.length - 1]){ // check if ingredient has fallen to the bottom of the pot + is the last ingredient in the recipe
+    if(this.yOff >= -65 && this == ingrAdded[recipIngr.length - 1]){ // check if ingredient has fallen to the bottom of the pot + is the last ingredient in the recipe
         print("THIS: " + this.yOff);
          potTime = false;
          endScreen = true;
@@ -467,9 +468,21 @@ class Ingredient {
 
   // Updates ingredient position
   updatePos() {
-      if(this.yOff < -60){ // As long as ingredient is above final position
-          this.yOff += 1.5;
-      }
+    // This section makes the ingredient fall
+    if (this.bobDir == 'fall' && this.yOff < -55) {
+      this.yOff += 1.5;
+    // Set it to rise once it's reached lower limit
+    } else if (this.bobDir == 'fall' && this.yOff >= -55) {
+      this.bobDir = 'rise';
+    }
+
+    // This section makes the ingredient rise
+    if (this.bobDir == 'rise' && this.yOff > -65) {
+      this.yOff -= 1.5;
+    // Set it to fall once it's reached upper limit
+    } else if (this.bobDir == 'rise' && this.yOff <= -65) {
+      this.bobDir = 'fall';
+    }
   }
 }
 
