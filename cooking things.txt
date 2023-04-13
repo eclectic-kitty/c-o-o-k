@@ -22,49 +22,67 @@ A popular cold dessert perfect for the summertime! The small light at the end of
 chiles en nogada
 Oh boy. Do you remember what it was? Yeah. What… How would I even describe such a dish? Shall I compare thee to the Mexican flag? Shall I describe thine warm, moist insides and thou sweet, sweet cream? That’s all I’ve got. This is an appetizing dish, I promise.
 
-ingredients:
-arroz / kanin
-Plain, white, stock image.
-You know what rice tastes like.
-The indica variant of this plant grows in tropical and subtropical regions such as Southeast Asia and South Asia
-pollo / manok
-breast.
-It’s a little provocative.
-Soft pillows. Raw.
-When she was a young girl, still living back home, your mother killed one, chopping its head off in a swift blow. The body, not knowing it was already dead, continued to run around, headless and bleeding out. She never ate meat ever again.
-Hot girl summer!!
-kondensada / leche condensada
-Chunky bovine secretion.
-Moo.
-Good for your bones
-Sweet thick and heavy
-pinetot (potato spiky)
-This is a starchy root vegetable. But it’s tasty! Nom nom nom. Ouch!
-Have you ever seen a Pokey from Super Mario? Yeah.
-The guy in The Martian lived off of them
-Best soft. Filling.
-Tubertastic!
-krouton (carrot)
-Crunch!
-Bad spray tan :(
-Your teacher will really enjoy this if they are perhaps a little bunny rabbit. Or Bugs Bunny. (add fake ingr. regular carrot?)
-A little sweet cronch
-suka (ube flavoured)
-Not the same as taro.
-This is a sweet and sour sauce made with a yam native to the Philippines.
-minecraft potion, skinny
-sweet, sour, and earthy, but with a distinctively nuttier, vanilla-like flavor
-chile bomblano
-You spin me right ‘round, baby, right ‘round
-Vortex of spice level 5000. Mild.
-Cold spicy
-Similar to a green bell pepper with a little more kick
-semillas saucepechosas
-This tastes… sus..
-Crunchy and juicy, this alien fruit is rich in fiber, vitamins, and minerals.
-i don’t know how to spell suspishus :(
-If this goes bad we should call for an emergency meeting.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+COOKBOOK PDF BELOW
 
+Pages:
+1: front, to be glued to something else
+2-3: cover page + title
+4-5: instructions:
+    - You and your partner must make a delicious meal together before the time runs out! You must look at the shared screen to find the corresponding pages in your cookbook – each page has an ingredient you mmust add and a hint/description of the ingredient. Be sure to communicate this to your partner! You must verbally communicate the instructions to your partner in order to add the correct ingredients in the correct order! Are you ready?
+6-13: Pic of recipe + description (two pages each)
+    - The descriptions are also in the sketch file, in the showMenu function
+14-18: Add a krouton:
+    - p. 14 Hint: Knockoff apple
+    - p. 15 Hint: Crunch!
+    - p. 16 Hint: Bad spray tan
+    - p. 17 Hint: Your teacher will really enjoy this if they are perhaps a little bunny rabbit.
+    - p. 18 Hint: A little sweet crunch!
+19-23: Add pollo/manok:
+    - Hint: Breast (from here on out, each hint corresponds to a page)
+    - Hint: It's a little provocative.
+    - Hint: Soft Pillows. Raw.
+    - Hint: When she was a young girl, still living back home, your mother killed one, chopping its head off in a swift blow. The body, not knowing it was already dead, continued to run around, headless and bleeding out. She never ate meat ever again.
+    - Hint: Hot girl summer!!
+24-28: Add chile bomblano:
+    - Hint: Swirly.
+    - Hint: You spin me right 'round, baby, right 'round
+    - Hint: Vortex of spice level 5000. Mild
+    - Hint: Cold Spicy
+    - Hint: Similar to a green bell pepper, with a little more of a kick
+29-32: Add kondensada/leche condensada:
+    - Hint: A confusing jar
+    - Hint: Chunky bovine secretion
+    - Hint: Moo.
+    - Hint: Sweet, thick, and heavy. Good for your bones.
+33-37: Add semillas saucepechosas:
+    - Hint: Lil red guys
+    - Hint: This tastes.... sus....
+    - Hint: Crunchy and juicy, this alien fruit is rich in fiber, vitamins and minerals
+    - Hint: I don't know how to spell suspishus
+    - Hint: If this goes bad we should call an emergency meeting
+38-42: Add pinetot:
+    - Hint: Brown object of some sort
+    - Hint: This is a starchy root vegetable. But it's tasty! Nom nom nom. Ouch!
+    - Hint: Have you ever seen a Pokey from Super Mario? Yeah.
+    - Hint: Suspiciously brown and theoretically spiky.
+    - Hint: Tubertastic.
+43-47: Add arroz/kanin:
+    - Hint: Warm, hearty bowl of white redacted
+    - Hint: Plain, white, stock image
+    - Hint: You know what rice tastes like
+    - Hint: A food staple for more than 3.5 billion people around the world, particularly in Asia, Latin America, and parts of Africa.
+    - Hint: A constant side dish to many of your favourite dishes. Sadly, this poor food is never the star of the show
+48-52: Add ube-flavoured suka
+    - Hint: Suspiciously purple liquid...
+    - Hint: Not the same as taro.
+    - Hint: This is a sweet and sour sauce made with a yam native to the Philippines
+    - Hint: Minecraft potion, skinny
+    - Hint: Sweet, sour, and earthy, but with a distinctively nuttier, vanilla-like flavor
+53-55: blank
+56: end, glued to fabric
+
+---------------------------------------------------------------------------------------------
 
 Questions:
 How do you feel about the little cookbook? We’re debating between the second player having a physical cookbook or a digital one – on one hand, the physical cookbook has better vibes, but is set on stone, whereas the digital one allows for more randomness and generation.
