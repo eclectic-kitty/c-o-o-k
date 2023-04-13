@@ -24,8 +24,8 @@ let creds = {
 let topic = 'CART253'; // This is the topic we are all subscribed to
 // End of MQTT client details
 
-let myName = "display"; // Who are you? Make sure it matches the previous person's variable!
-let nextName = "phone"; // Who is next on the list? Make sure it matches the next person's variable!
+let myName = "pot"; // This script's identity
+let nextName = "pantry"; // Identity of other script
 
 
 
