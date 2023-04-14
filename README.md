@@ -5,6 +5,8 @@ Concordia University
 Aurora Becerra Granados & Abigail Lopez
 
 ![menu](screenshots/menu.png)
+![book](screenshots/book.JPG)
+![pantry](screenshots/pantry.png)
 ![pot](screenshots/potReal.png)
 ![end](screenshots/endScreen.png)
 
@@ -47,10 +49,14 @@ We also wanted to add more ingredients, either as decoys or as ingredients thems
 
 It was also suggested to add some flavour text and some background as to why players were playing the game, which we would've loved to add in future iterations. Music and other sound design would've also been fun to add to contribute to the atmosphere of the game.
 
+In terms of feedback from our final critique, we got positive feedback. People thought it was fun, liked how difficult the gameplay was, made several connections to other games (notably Keep Talking and Nobody Explodes as well as Cook Your Way), and liked the exploration of culture and the sense of disconnect one may have with it. In future iterations of this project we definitely want to be working on more playtesting and finetuning the hints so that it isn't as difficult.
+
 -------------------------------------------------------------
 
 ### Sketches, ideas:
-There's concept art in the concept art folder.
+There's concept art in the concept art folder. Here's some of it!
+![concept1](concept art/conceptSketch.JPG)
+![concept2](concept art/layout stuff.JPG)
 
 -------------------------------------------------------------
 
