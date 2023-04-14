@@ -54,9 +54,7 @@ In terms of feedback from our final critique, we got positive feedback. People t
 -------------------------------------------------------------
 
 ### Sketches, ideas:
-There's concept art in the concept art folder. Here's some of it!
-![concept1](concept art/conceptSketch.JPG)
-![concept2](concept art/layout stuff.JPG)
+There's concept art in the concept art folder!
 
 -------------------------------------------------------------
 
