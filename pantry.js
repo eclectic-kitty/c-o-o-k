@@ -2,6 +2,8 @@
 This is the script for the pantry display / controller.
 On this screen, the player can see and select the ingredients that will end up in the pot.
 
+MQTT code from template written by our professor, Lee Wilkins.
+
 We are using the Eclipse Paho MQTT client library: https://www.eclipse.org/paho/clients/js/ to 
 create an MQTT client that sends and receives messages. The client is set up for use on the shiftr.io 
 test MQTT broker (https://shiftr.io/try)
