@@ -4,7 +4,7 @@ CART 263, Creative Computation II, Winter 2023
 Concordia University
 Aurora Becerra Granados & Abigail Lopez
 
-MQTTT code from template written by our professor, Lee Wilkins.
+MQTT code from template written by our professor, Lee Wilkins.
 
 We are using the Eclipse Paho MQTT client library: https://www.eclipse.org/paho/clients/js/ to create an MQTT client that sends and receives messages. The client is set up for use on the shiftr.io test MQTT broker (https://shiftr.io/try)
 
